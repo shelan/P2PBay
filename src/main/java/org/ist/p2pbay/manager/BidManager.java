@@ -16,16 +16,19 @@
 
 package org.ist.p2pbay.manager;
 
-
 import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.storage.Data;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ist.p2pbay.data.BidInfo;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.util.Constants;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class handles all the bid related inforamtion
@@ -33,12 +36,14 @@ import java.util.Iterator;
 public class BidManager {
 
     private Peer peer;
+    public static final Log log = LogFactory.getLog(BidManager.class);
+
 
     public BidManager(Peer peer) {
         this.peer = peer;
     }
 
-    public boolean addBid(String itemName, BidInfo bid) throws InterruptedException, IOException {
+    public boolean addBid(String itemName, BidInfo bid) throws P2PBayException {
         boolean isSuccess = false;
         try {
             FutureDHT futureDHT = peer.add(Number160.createHash(itemName)).setData((new Data(bid))).
@@ -48,13 +53,13 @@ public class BidManager {
             isSuccess = futureDHT.isSuccess();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception thrown while accessing object");
+            log.error(ex);
+            throw new P2PBayException("Exception thrown while accessing object");
         }
         return isSuccess;
     }
 
-    public BidInfo getHighestBid(String item) {
+    public BidInfo getHighestBid(String item) throws P2PBayException {
 
         BidInfo highestBid = new BidInfo("none", 0.0);
         try {
@@ -63,17 +68,17 @@ public class BidManager {
                     start();
             futureDHT.awaitUninterruptibly();
 
-                Iterator<Data> dataItr = futureDHT.getDataMap().values().iterator();
+            Iterator<Data> dataItr = futureDHT.getDataMap().values().iterator();
 
-                while (dataItr.hasNext()) {
-                    BidInfo currentBid = (BidInfo) dataItr.next().getObject();
-                    if (highestBid.getAmount() < currentBid.getAmount())
-                        highestBid = currentBid;
-                }
+            while (dataItr.hasNext()) {
+                BidInfo currentBid = (BidInfo) dataItr.next().getObject();
+                if (highestBid.getAmount() < currentBid.getAmount())
+                    highestBid = currentBid;
+            }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception thrown while retrieving object");
+            log.error(ex);
+            throw new P2PBayException("Exception thrown while retrieving object");
         }
 
         return highestBid;
@@ -94,5 +99,27 @@ public class BidManager {
         }
         return 0;
     }
+
+    public List<BidInfo> getBidList(String itemName) {
+        ArrayList<BidInfo> bidList = new ArrayList<BidInfo>();
+        try {
+            FutureDHT futureDHT = peer.get(Number160.createHash(itemName)).setAll().
+                    setDomainKey((Number160.createHash(Constants.BID_DOMAIN))).
+                    start();
+            futureDHT.awaitUninterruptibly();
+            if (futureDHT.getDataMap() != null) {
+                Iterator<Data> dataItr = futureDHT.getDataMap().values().iterator();
+                while (dataItr.hasNext()) {
+                    BidInfo currentBid = (BidInfo) dataItr.next().getObject();
+                    bidList.add(currentBid);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Exception thrown while retrieving object");
+        }
+        return bidList;
+    }
+
 
 }

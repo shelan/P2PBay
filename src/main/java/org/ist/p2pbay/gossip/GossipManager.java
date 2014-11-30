@@ -43,6 +43,10 @@ public class GossipManager {
     private InformationRepository userInfoRepo;
     private InformationRepository itemInfoRepo;
 
+    NodeCountWorker nodeCountWorker;
+    UserCountWorker userCountWorker;
+    ItemCountWorker itemCountWorker;
+
     public InformationRepository getNodeInfoRepo() {
         return nodeInfoRepo;
     }
@@ -84,12 +88,18 @@ public class GossipManager {
 
     public void runGossip() {
 
-        Thread nodeCountWorker = new Thread(new NodeCountWorker(peer, nodeInfoRepo));
-        Thread userCountWorker = new Thread(new UserCountWorker(peer, userInfoRepo));
-        Thread itemCountWorker = new Thread(new ItemCountWorker(peer, itemInfoRepo));
+        nodeCountWorker = new NodeCountWorker(peer, nodeInfoRepo);
+        userCountWorker = new UserCountWorker(peer, userInfoRepo);
+        itemCountWorker = new ItemCountWorker(peer, itemInfoRepo);
         nodeCountWorker.start();
         userCountWorker.start();
         itemCountWorker.start();
+
+    }
+
+    public void stopGossip(){
+
+            nodeCountWorker.setStop(true);
 
     }
 

@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ist.P2PBayApp;
 import org.ist.p2pbay.data.Item;
 import org.ist.p2pbay.data.User;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.manager.SalesManager;
 import org.ist.p2pbay.manager.UserManager;
@@ -70,7 +71,8 @@ public class P2pGossipTest{
     }
 
     @Test(groups = {"gossiptest"})
-    public void testUserAdding() throws NoSuchAlgorithmException, IOException, ClassNotFoundException, InterruptedException {
+    public void testUserAdding() throws InterruptedException, P2PBayException, NoSuchAlgorithmException,
+            UnsupportedEncodingException {
 
         System.out.println("Adding users");
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -95,7 +97,7 @@ public class P2pGossipTest{
     }
 
     @Test(groups = {"gossiptest"}, dependsOnMethods = {"testUserAdding"})
-    public void testUserLogin() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public void testUserLogin() throws P2PBayException {
         log.info("Starting user tests");
         for (int i = 0; i < numberOfIterations; i++) {
             UserManager userManager = appList.get(new Random().nextInt(numberOfApps)).getUserManager();
@@ -128,7 +130,7 @@ public class P2pGossipTest{
     }
 
     @Test(groups = {"gossiptest"})
-    public void testItemAdding() throws InterruptedException {
+    public void testItemAdding() throws InterruptedException, P2PBayException {
         for (int i = 0; i < 100; i++) {
             SalesManager salesManager = appList.get(new Random().nextInt(numberOfApps)).getSalesManager();
             salesManager.addItem(baseItemName + i, new Item(baseItemName + i, baseUserName + i));

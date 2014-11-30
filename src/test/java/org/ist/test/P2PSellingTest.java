@@ -22,6 +22,7 @@ import org.ist.P2PBayApp;
 import org.ist.p2pbay.data.BidInfo;
 import org.ist.p2pbay.data.Item;
 import org.ist.p2pbay.data.User;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.manager.BidManager;
 import org.ist.p2pbay.manager.SalesManager;
 import org.ist.p2pbay.manager.UserManager;
@@ -58,7 +59,8 @@ public class P2PSellingTest {
     }
 
     @Test
-    public void testUserAdding() throws NoSuchAlgorithmException, IOException, ClassNotFoundException, InterruptedException {
+    public void testUserAdding() throws NoSuchAlgorithmException, IOException, ClassNotFoundException,
+            InterruptedException, P2PBayException {
 
         System.out.println("Adding users");
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
@@ -77,7 +79,7 @@ public class P2PSellingTest {
     }
 
     @Test(dependsOnMethods = {"testUserAdding"})
-    public void testAddandGetItems() {
+    public void testAddandGetItems() throws P2PBayException {
         for (int i = 0; i < numberOfIterations; i++) {
             SalesManager salesManager = appList.get(new Random().nextInt(numberOfApps)).getSalesManager();
             UserManager userManager = appList.get(new Random().nextInt(numberOfApps)).getUserManager();
@@ -104,7 +106,7 @@ public class P2PSellingTest {
     }
 
     @Test(dependsOnMethods = {"testAddandGetItems"})
-    public void testBidding() throws IOException, InterruptedException {
+    public void testBidding() throws IOException, InterruptedException, P2PBayException {
         for (int i = 0; i < numberOfIterations; i++) {
             BidManager bidManager = appList.get(new Random().nextInt(numberOfApps)).getBidManager();
             UserManager userManager = appList.get(new Random().nextInt(numberOfApps)).getUserManager();

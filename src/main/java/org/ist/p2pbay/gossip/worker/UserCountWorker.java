@@ -29,8 +29,9 @@ import org.ist.p2pbay.gossip.repository.InformationRepository;
 import java.util.List;
 import java.util.Random;
 
-public class UserCountWorker implements Runnable {
+public class UserCountWorker extends Thread {
 
+    private boolean stop;
     private Peer peer;
     private InformationRepository userInfoRepo;
     public static final Log log = LogFactory.getLog(UserCountWorker.class);
@@ -38,6 +39,7 @@ public class UserCountWorker implements Runnable {
     public UserCountWorker( Peer peer, InformationRepository userInfoRepo) {
         this.userInfoRepo = userInfoRepo;
         this.peer = peer;
+        this.stop = false;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class UserCountWorker implements Runnable {
             e.printStackTrace();
         }
 
-        while (true) {
+        while (!stop) {
             List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
             if (peerAddressList.size() > 0) {
                 PeerAddress address = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
@@ -74,5 +76,13 @@ public class UserCountWorker implements Runnable {
             }
         }
 
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }

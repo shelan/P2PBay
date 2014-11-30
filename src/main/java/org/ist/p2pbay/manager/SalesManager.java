@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ist.p2pbay.data.BidInfo;
 import org.ist.p2pbay.data.Item;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.util.Constants;
@@ -60,7 +61,7 @@ public class SalesManager {
      * @param name
      * @param item
      */
-    public void addItem(String name, Item item) {
+    public void addItem(String name, Item item) throws P2PBayException {
         try {
             FutureDHT futureDHT = peer.put(Number160.createHash(name)).setData(new Data(item))
                     .setDomainKey(Number160.createHash(Constants.ITEM_DOMAIN))
@@ -69,8 +70,7 @@ public class SalesManager {
             notifyGossipManager(true);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception thrown while accessing object");
+           throw new P2PBayException("Error while adding item",ex);
         }
     }
 

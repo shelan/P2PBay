@@ -21,42 +21,53 @@ import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.storage.Data;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ist.p2pbay.data.User;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.util.Constants;
 
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 public class UserManager {
 
     private Peer peer;
     private GossipManager gossipManager;
-    private HashMap<String,User> loggedInUsers = new HashMap<String, User>();
+    private HashMap<String, User> loggedInUsers = new HashMap<String, User>();
+    public static final Log log = LogFactory.getLog(UserManager.class);
 
-    public UserManager(Peer peer,GossipManager manager) throws Exception {
+    public UserManager(Peer peer, GossipManager manager) throws Exception {
         this.peer = peer;
         this.gossipManager = manager;
     }
 
-    public boolean login(String username, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public boolean login(String username, String password) throws P2PBayException {
 
         User user = getUser(username);
-        if(user == null) {
+        if (user == null) {
             return false;
         }
-        MessageDigest messageDigest = MessageDigest.getInstance(Constants.ALGORITHM);
-        messageDigest.update(password.getBytes(Constants.CHARSET_NAME));
-        byte[] enteredDigest = messageDigest.digest();
 
-        String originalDecoded = new String(user.getPassword(), Constants.CHARSET_NAME);
-        String enteredDecoded = new String(enteredDigest, Constants.CHARSET_NAME);
+        String originalDecoded;
+        String enteredDecoded;
+
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance(Constants.ALGORITHM);
+            messageDigest.update(password.getBytes(Constants.CHARSET_NAME));
+            byte[] enteredDigest = messageDigest.digest();
+
+            originalDecoded = new String(user.getPassword(), Constants.CHARSET_NAME);
+            enteredDecoded = new String(enteredDigest, Constants.CHARSET_NAME);
+        } catch (Exception e) {
+            log.error(e);
+            throw new P2PBayException("Error while encoding");
+        }
 
         boolean isLoggedIn = false;
-        if(originalDecoded.equals(enteredDecoded)) {
+        if (originalDecoded.equals(enteredDecoded)) {
             System.out.println("Successfully logged in.");
             isLoggedIn = true;
             addLoggedInUser(username, user);
@@ -65,20 +76,22 @@ public class UserManager {
         }
         return isLoggedIn;
     }
+
     /**
      * Add user to the system
+     *
      * @param name
      * @param obj
      */
-    public void addUser(String name, User obj) {
+    public void addUser(String name, User obj) throws P2PBayException {
         try {
             peer.put(Number160.createHash(name)).setData(new Data(obj)).setDomainKey(Number160.createHash(Constants.USER_DOMAIN))
                     .start().awaitUninterruptibly();
             notifyGossipManager(true);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception thrown while accessing object");
+           log.error(ex);
+           throw new P2PBayException("Exception thrown while accessing object");
         }
     }
 
@@ -115,17 +128,26 @@ public class UserManager {
         return loggedInUsers.get(userName);
     }
 
-    public void addLoggedInUser(String name, User loggedInUser) {
-        loggedInUsers.put(name,loggedInUser);
+    public boolean logout(String userName) {
+        loggedInUsers.remove(userName);
+        return loggedInUsers.containsKey(userName);
     }
 
-    private void notifyGossipManager(boolean isAdd){
-        if(isAdd) {
+    public boolean isLoggedIn(String userName) {
+        return loggedInUsers.containsKey(userName);
+    }
+
+    public void addLoggedInUser(String name, User loggedInUser) {
+        loggedInUsers.put(name, loggedInUser);
+    }
+
+    private void notifyGossipManager(boolean isAdd) {
+        if (isAdd) {
             GossipObject gossipObject = new GossipObject();
             gossipObject.setCount(1.0);
             gossipObject.setWeight(0.0);
             gossipManager.getUserInfoRepo().mergeGossipObject(gossipObject);
-        }else {
+        } else {
             GossipObject gossipObject = new GossipObject();
             gossipObject.setCount(-1.0);
             gossipObject.setWeight(0.0);

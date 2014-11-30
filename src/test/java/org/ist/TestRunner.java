@@ -1,8 +1,8 @@
 package org.ist;
 
 import org.ist.p2pbay.data.BidInfo;
+import org.ist.p2pbay.exception.P2PBayException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,7 +20,7 @@ public class TestRunner {
         for (int i =0 ; i< numOfNodes ; i++) {
             P2PBayApp app = new P2PBayApp();
             if(i==0)
-            app.bootstrap (String.valueOf(i),"127.0.0.1",String.valueOf(4000),String.valueOf(4000+i));
+            app.bootstrap ("127.0.0.1",String.valueOf(4000),String.valueOf(4000+i));
             apps.add(app);
         }
 
@@ -44,9 +44,9 @@ public class TestRunner {
                     }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
+                        } catch (P2PBayException e) {
+                        e.printStackTrace();
+                    } finally {
                         atomicInteger.getAndDecrement();
                     }
 

@@ -1,6 +1,7 @@
 package org.ist.p2pbay.util;
 
 import org.ist.p2pbay.data.User;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.manager.UserManager;
 
 import java.io.UnsupportedEncodingException;
@@ -12,7 +13,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class TempUtil {
 
-    public static void addUser(UserManager userManager) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static void addUser(UserManager userManager) throws NoSuchAlgorithmException, UnsupportedEncodingException,
+            P2PBayException {
         /////// this is a temp code to create a USER_DOMAIN for testing
         // username : USER_DOMAIN
         //password : 123

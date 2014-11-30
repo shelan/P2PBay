@@ -31,15 +31,17 @@ import java.util.Random;
 /**
  * Created by shelan on 11/27/14.
  */
-public class NodeCountWorker implements Runnable {
+public class NodeCountWorker extends Thread {
 
     private Peer peer;
     private InformationRepository infoRepo;
+    private boolean stop;
     public static final Log log = LogFactory.getLog(NodeCountWorker.class);
 
     public NodeCountWorker(Peer peer, InformationRepository infoRepo) {
         this.peer = peer;
         this.infoRepo = infoRepo;
+        this.stop = false;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class NodeCountWorker implements Runnable {
                 e.printStackTrace();
             }
 
-            while (true) {
+            while (!stop) {
                 List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
                 if (peerAddressList.size() > 0) {
                     PeerAddress address = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
@@ -79,5 +81,13 @@ public class NodeCountWorker implements Runnable {
             }
         }
 
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }

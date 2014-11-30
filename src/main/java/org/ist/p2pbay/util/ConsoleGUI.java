@@ -2,6 +2,7 @@ package org.ist.p2pbay.util;
 
 import org.ist.p2pbay.data.Item;
 import org.ist.p2pbay.data.User;
+import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.manager.BidManager;
 import org.ist.p2pbay.manager.SalesManager;
 import org.ist.p2pbay.manager.SearchManager;
@@ -68,6 +69,8 @@ public class ConsoleGUI {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (P2PBayException e) {
+            e.printStackTrace();
         }
         return newAccountCreated;
     }
@@ -100,7 +103,7 @@ public class ConsoleGUI {
     }
 
 
-    private void startConsoleApp() throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
+    private void startConsoleApp() throws NoSuchAlgorithmException, IOException, ClassNotFoundException, P2PBayException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         String userName;
         String password;
@@ -189,7 +192,7 @@ public class ConsoleGUI {
         }
     }
 
-    private void getUserActionToPerform(String userID) throws IOException {
+    private void getUserActionToPerform(String userID) throws IOException, P2PBayException {
         // TODO Auto-generated method stub
         //Runtime.getRuntime().exec("cls");//to cleat the console
         System.out.println("1 Create Item ");
