@@ -1,0 +1,16 @@
+# Created by .gitignore support plugin (hsz.mobi)
+.idea/*
+
+p2p-bay.iml
+*.class
+
+*.jar
+
+target
+*.iml
+
+*.iml
+
+*.iml
+
+*.iml
