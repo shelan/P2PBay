@@ -46,7 +46,7 @@ public class BidManager {
     public boolean addBid(String itemName, BidInfo bid) throws P2PBayException {
         boolean isSuccess = false;
         try {
-            FutureDHT futureDHT = peer.add(Number160.createHash(itemName)).setData((new Data(bid))).
+            FutureDHT futureDHT = peer.add(Number160.createHash(Constants.BID_DOMAIN + itemName)).setData((new Data(bid))).
                     setDomainKey(Number160.createHash(Constants.BID_DOMAIN)).
                     start();
             futureDHT.awaitUninterruptibly();
@@ -63,7 +63,7 @@ public class BidManager {
 
         BidInfo highestBid = new BidInfo("none", 0.0);
         try {
-            FutureDHT futureDHT = peer.get(Number160.createHash(item)).setAll().
+            FutureDHT futureDHT = peer.get(Number160.createHash(Constants.BID_DOMAIN + item)).setAll().
                     setDomainKey((Number160.createHash(Constants.BID_DOMAIN))).
                     start();
             futureDHT.awaitUninterruptibly();
@@ -86,7 +86,7 @@ public class BidManager {
 
     public int getBidCount(String item) {
         try {
-            FutureDHT futureDHT = peer.get(Number160.createHash(item)).setAll().
+            FutureDHT futureDHT = peer.get(Number160.createHash(Constants.BID_DOMAIN + item)).setAll().
                     setDomainKey((Number160.createHash(Constants.BID_DOMAIN))).
                     start();
             futureDHT.awaitUninterruptibly();
@@ -103,7 +103,7 @@ public class BidManager {
     public List<BidInfo> getBidList(String itemName) {
         ArrayList<BidInfo> bidList = new ArrayList<BidInfo>();
         try {
-            FutureDHT futureDHT = peer.get(Number160.createHash(itemName)).setAll().
+            FutureDHT futureDHT = peer.get(Number160.createHash(Constants.BID_DOMAIN + itemName)).setAll().
                     setDomainKey((Number160.createHash(Constants.BID_DOMAIN))).
                     start();
             futureDHT.awaitUninterruptibly();

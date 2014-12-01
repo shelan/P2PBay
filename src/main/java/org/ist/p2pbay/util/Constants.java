@@ -13,6 +13,8 @@ public class Constants {
     public static final char OR_OPERATION = '|';
 
     public static final int DEFAULT_TIME_OUT = 5000;
-    public static final String ALGORITHM = "SHA-256";
-    public static final String CHARSET_NAME = "UTF-8";
+    public static final String ALGORITHM_SHA_256 = "SHA-256";
+    public static final String CHARSET_NAME_UTF_8 = "UTF-8";
+
+    public static final String EXIT = "Y";
 }

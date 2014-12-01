@@ -85,8 +85,6 @@ public class SalesManager {
                     .start();
             futureDHT.awaitUninterruptibly();
             if (futureDHT.isSuccess()) {
-                System.out.println("future sucess");
-                System.out.println(futureDHT.getData());
                 Item item = (Item) futureDHT.getData().getObject();
                 return item;
             }
@@ -119,18 +117,23 @@ public class SalesManager {
     }
 
     /**
+     * @param userName
      * @param itemTitle
      * @return
      */
 
     //After closing the auction user object has to be updated with purchased list and for seller sold list
-    public BidInfo closeAuction(String itemTitle) {
+    public BidInfo closeAuction(String userName, String itemTitle) {
         try {
-            BidInfo bidInfo = bidManager.getHighestBid(itemTitle);
             Item currentItem = getItem(itemTitle);
+            if(!currentItem.getSellerId().equals(userName)) {
+                log.error("Only the item owner can close auction");
+                return null;
+            }
+            BidInfo bidInfo = bidManager.getHighestBid(itemTitle);
             currentItem.setIsSold(true);
             addItem(itemTitle, currentItem);
-            log.info("Accepted " + bidInfo.getAmount() + "of user " + bidInfo.getUserId() + " for item " + itemTitle);
+            log.debug("Accepted " + bidInfo.getAmount() + "of user " + bidInfo.getUserId() + " for item " + itemTitle);
             return bidInfo;
         } catch (Exception ex) {
             log.error("Error while updating the bid. " + ex);

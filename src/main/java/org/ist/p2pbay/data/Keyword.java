@@ -30,4 +30,8 @@ public class Keyword implements Serializable {
     public void addItem(String itemId) {
         items.add(itemId);
     }
+
+    public void removeItem(String itemId) {
+        items.remove(itemId);
+    }
 }

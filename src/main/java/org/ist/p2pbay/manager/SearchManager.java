@@ -23,6 +23,7 @@ import net.tomp2p.storage.Data;
 import org.ist.p2pbay.util.Constants;
 import org.ist.p2pbay.data.Keyword;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,15 +44,31 @@ public class SearchManager {
         this.peer = peer;
     }
 
-    public void addItemToKeyword(String keyword, String itemId) {
-        keyword = keyword.toLowerCase();
+    public void addItemToKeyword(String itemTitle) {
+        String keyword = itemTitle.toLowerCase();
         if(keyword.contains(" ")) {
             String[] keywordArray = getKeywordsArray(keyword);
             for(String word : keywordArray) {
-                addItem(word, itemId);
+                addKeywordObject(word, itemTitle);
             }
         } else {
-            addItem(keyword, itemId);
+            addKeywordObject(keyword, itemTitle);
+        }
+    }
+
+    public void removeItemFromKeywordObjects(String itemTitle) {
+        String keyword = itemTitle.toLowerCase();
+        if (keyword.contains(" ")) {
+            String[] keywordArray = getKeywordsArray(keyword);
+            for (String word : keywordArray) {
+                Keyword keywordObj = getKeywordObject(word);
+                keywordObj.removeItem(itemTitle);
+                replaceKeywordObject(word, keywordObj);
+            }
+        } else {
+            Keyword keywordObj = getKeywordObject(keyword);
+            keywordObj.removeItem(itemTitle);
+            replaceKeywordObject(keyword, keywordObj);
         }
     }
 
@@ -60,7 +77,7 @@ public class SearchManager {
         return keywordString.split(" ");
     }
 
-    private void addItem(String keyword, String itemId) {
+    private void addKeywordObject(String keyword, String itemId) {
         try {
             Keyword existingObject = getKeywordObject(keyword);
             if(existingObject == null) {
@@ -76,11 +93,19 @@ public class SearchManager {
                 peer.put(Number160.createHash(keyword)).setData(new Data(existingObject)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
                         .start().awaitUninterruptibly();
             }
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("Exception thrown while accessing object");
+        }
+    }
+
+    private void replaceKeywordObject(String keyword, Keyword keywordObj) {
+        try {
+            peer.put(Number160.createHash(keyword)).setData(new Data(keywordObj)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
+                    .start().awaitUninterruptibly();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error while replacing keyword object for keyword: " + keyword);
         }
     }
 

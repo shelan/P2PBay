@@ -10,9 +10,11 @@ import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.info.StatPublisher;
 import org.ist.p2pbay.manager.*;
+import org.ist.p2pbay.util.UI;
 
 import java.io.Console;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +47,11 @@ public class P2PBayApp {
         P2PBayApp app = new P2PBayApp();
         //app.bootstrap(args[0], args[1], args[2]);
         app.bootstrap(args[0], args[1], args[2]);
+        app.startConsoleApp();
+    }
 
-        //app.startConsoleApp();
-
+    private void startConsoleApp() {
+        new UI(this).launchUI();
     }
 
     //private void bootstrap(String bootstrapIp, String bootstrapPort, String currentPort ) throws Exception{
@@ -67,7 +71,7 @@ public class P2PBayApp {
         gossipManager.runGossip();
 
         Thread statPublisher = new StatPublisher(getPeer(),gossipManager);
-        statPublisher.start();
+        //statPublisher.start();
 
         //remove this during production
 
@@ -105,59 +109,77 @@ public class P2PBayApp {
         Item item = new Item(title,user);
         item.setDescription(description);
         salesManager.addItem(title,item);
+        searchManager.addItemToKeyword(title);
     }
 
-    public boolean bidItem(String itemName, double amount, String user) throws P2PBayException{
-        if(bidManager.getHighestBid(itemName).getAmount()>amount){
+    public Item getItem(String title) {
+        return salesManager.getItem(title);
+    }
+
+    public boolean bidItem(String itemName, double amount, String userName) throws P2PBayException{
+        if(bidManager.getHighestBid(itemName).getAmount() >= amount){
             return false;
         }
-        BidInfo bid = new BidInfo(user,amount);
-        return bidManager.addBid(itemName,bid);
+        BidInfo bid = new BidInfo(userName,amount);
+        boolean isSuccessful = bidManager.addBid(itemName,bid);
+        if(isSuccessful) {
+            User user = userManager.getUser(userName);
+            user.addBadeItems(itemName, amount);
+            userManager.addUser(userName, user);
+        }
+        return isSuccessful;
     }
 
-    public List<Item> simpleSearch(String keyword){
+    public String[] simpleSearch(String keyword){
         String []  items = searchManager.getMatchingItems(keyword);
-        ArrayList<Item> fetchedItems = new ArrayList<Item>();
-        for (String item : items) {
-            fetchedItems.add(salesManager.getItem(item));
-        }
-        return fetchedItems;
+        return items;
     }
 
-    public List<Item> advanceSearch(String keyword1, String keyword2, char operator){
+    public String[] advanceSearch(String keyword1, String keyword2, char operator){
         String []  items = searchManager.getMatchingItems(keyword1, keyword2, operator);
-        ArrayList<Item> fetchedItems = new ArrayList<Item>();
-        for (String item : items) {
-            fetchedItems.add(salesManager.getItem(item));
-        }
-        return fetchedItems;
+        return items;
     }
 
-    public void closeAuction(String item) throws P2PBayException {
+    public BidInfo closeAuction(String userName, String itemTitle) throws P2PBayException {
 
-            salesManager.closeAuction(item);
-            BidInfo highestBid = bidManager.getHighestBid(item);
+        BidInfo bidInfo = salesManager.closeAuction(userName, itemTitle);
+        if (bidInfo != null) {
+            BidInfo highestBid = bidManager.getHighestBid(itemTitle);
             User winningUser = userManager.getUser(highestBid.getUserId());
-            User seller = userManager.getUser(salesManager.getItem(item).getSellerId());
+            User seller = userManager.getUser(salesManager.getItem(itemTitle).getSellerId());
 
-            winningUser.addPurchasedItems(item, highestBid.getAmount());
-            winningUser.removeFromBadeItems(item);
+            winningUser.addPurchasedItems(itemTitle, highestBid.getAmount());
+            winningUser.removeFromBadeItems(itemTitle);
 
-            seller.removeFromSellingItems(item);
+            seller.removeFromSellingItems(itemTitle);
 
             userManager.addUser(seller.getName(), seller);
             userManager.addUser(winningUser.getName(), winningUser);
 
-            salesManager.removeItem(item);
+            salesManager.removeItem(itemTitle);
+            searchManager.removeItemFromKeywordObjects(itemTitle);
+        }
+        return bidInfo;
     }
 
-    public List <BidInfo> getBidHistory(String itemName){
+    public List <BidInfo> getItemBidHistory(String itemName){
         return bidManager.getBidList(itemName);
     }
 
-    private Map<String,Double> getPurchaseHistory(String username){
-        User user = userManager.getUser(username);
-       return user.getPurchasedItems();
+    public Map<String, Double> getUserBidHistory(String userName) {
+        User user = userManager.getUser(userName);
+        if( user!= null) {
+            return user.getBadeItems();
+        }
+        return new Hashtable<String, Double>();
+    }
+
+    public Map<String, Double> getUserPurchasedHistory(String userName) {
+        User user = userManager.getUser(userName);
+        if( user!= null) {
+            return user.getPurchasedItems();
+        }
+        return new Hashtable<String, Double>();
     }
 
     public SalesManager getSalesManager() {

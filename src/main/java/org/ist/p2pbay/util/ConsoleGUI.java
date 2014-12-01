@@ -221,7 +221,7 @@ public class ConsoleGUI {
 
                     //add ITEM_DOMAIN for KEYWORD_DOMAIN
                     // TODO..... should split in search manager side
-                    searchManager.addItemToKeyword(newItem.getTitle(), newItem.getTitle());
+                    searchManager.addItemToKeyword(newItem.getTitle());
 
                     /*String KEYWORD_DOMAIN= console.readLine("Search ITEM_DOMAIN:");
                     String items[] = searchManager.getMatchingItems(KEYWORD_DOMAIN);

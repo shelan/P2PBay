@@ -128,7 +128,7 @@ public class P2PSellingTest {
         Assert.assertEquals(userManager.getUser(baseUserName + 3).getBadeItems().get("item1"), 1.0 + 1.0 * 3);
 
 
-        salesManager.closeAuction(baseItemName + 1);
+        salesManager.closeAuction(baseUserName +1, baseItemName + 1);
 
         //update information about the transaction.
         BidInfo highestBid = bidManager.getHighestBid(baseItemName + 1);

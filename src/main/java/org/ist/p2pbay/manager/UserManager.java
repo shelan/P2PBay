@@ -55,12 +55,12 @@ public class UserManager {
         String enteredDecoded;
 
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance(Constants.ALGORITHM);
-            messageDigest.update(password.getBytes(Constants.CHARSET_NAME));
+            MessageDigest messageDigest = MessageDigest.getInstance(Constants.ALGORITHM_SHA_256);
+            messageDigest.update(password.getBytes(Constants.CHARSET_NAME_UTF_8));
             byte[] enteredDigest = messageDigest.digest();
 
-            originalDecoded = new String(user.getPassword(), Constants.CHARSET_NAME);
-            enteredDecoded = new String(enteredDigest, Constants.CHARSET_NAME);
+            originalDecoded = new String(user.getPassword(), Constants.CHARSET_NAME_UTF_8);
+            enteredDecoded = new String(enteredDigest, Constants.CHARSET_NAME_UTF_8);
         } catch (Exception e) {
             log.error(e);
             throw new P2PBayException("Error while encoding");
