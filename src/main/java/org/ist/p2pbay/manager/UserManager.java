@@ -70,7 +70,7 @@ public class UserManager {
         if (originalDecoded.equals(enteredDecoded)) {
             System.out.println("Successfully logged in.");
             isLoggedIn = true;
-            addLoggedInUser(username, user);
+            loggedInUsers.put(username, user);
         } else {
             System.out.println("Password does not match. Please try again");
         }
@@ -124,10 +124,6 @@ public class UserManager {
         return null;
     }
 
-    public User getLoggedInUser(String userName) {
-        return loggedInUsers.get(userName);
-    }
-
     public boolean logout(String userName) {
         loggedInUsers.remove(userName);
         return loggedInUsers.containsKey(userName);
@@ -136,11 +132,7 @@ public class UserManager {
     public boolean isLoggedIn(String userName) {
         return loggedInUsers.containsKey(userName);
     }
-
-    public void addLoggedInUser(String name, User loggedInUser) {
-        loggedInUsers.put(name, loggedInUser);
-    }
-
+    
     private void notifyGossipManager(boolean isAdd) {
         if (isAdd) {
             GossipObject gossipObject = new GossipObject();
