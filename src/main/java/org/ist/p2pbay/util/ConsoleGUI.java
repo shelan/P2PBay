@@ -95,7 +95,7 @@ public class ConsoleGUI {
         if (originalDecoded.equals(enteredDecoded)) {
             System.out.println("Successfully logged in.");
             isLoggedIn = true;
-            userManager.addLoggedInUser(userName, user);
+          //  userManager.addLoggedInUser(userName, user);
         } else {
             System.out.println("Password does not match. Please try again");
         }

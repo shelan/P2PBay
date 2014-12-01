@@ -132,7 +132,7 @@ public class UserManager {
     public boolean isLoggedIn(String userName) {
         return loggedInUsers.containsKey(userName);
     }
-    
+
     private void notifyGossipManager(boolean isAdd) {
         if (isAdd) {
             GossipObject gossipObject = new GossipObject();
