@@ -47,7 +47,7 @@ public class ItemCountWorker extends Thread {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           log.error("interrupted");
         }
 
         while (!stop) {
@@ -57,10 +57,10 @@ public class ItemCountWorker extends Thread {
                 //System.out.println("Sending request from " + peer);
 
                 GossipObject dataHolder = itemInfoRepo.getinfoHolder();
-                //if(log.isDebugEnabled())
-                System.out.println(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
-                            dataHolder.getWeight() + " Item count --> "+
-                            dataHolder.getCount()/ dataHolder.getWeight());
+                if(log.isDebugEnabled())
+                log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :" +
+                        dataHolder.getWeight() + " Item count --> " +
+                        dataHolder.getCount() / dataHolder.getWeight());
 
                 ItemCountMessage message = new ItemCountMessage(itemInfoRepo.sliceGossipObject());
 
@@ -70,7 +70,7 @@ public class ItemCountWorker extends Thread {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    log.error("interrupted ",e);
+                    log.error("interrupted ", e);
                 }
 
             }

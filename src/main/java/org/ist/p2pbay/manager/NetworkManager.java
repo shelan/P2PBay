@@ -23,6 +23,8 @@ import net.tomp2p.futures.FutureDiscover;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.p2p.PeerMaker;
 import net.tomp2p.peers.Number160;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -36,6 +38,7 @@ import java.util.Random;
 public class NetworkManager {
 
     private Peer peer;
+    private static Log log = LogFactory.getLog(NetworkManager.class);
 
     /**
      * Bootstrapping a node to a ring or start own by your self
@@ -59,12 +62,13 @@ public class NetworkManager {
         InetAddress address = Inet4Address.getByName(ip);
         FutureDiscover futureDiscover = peer.discover().setInetAddress(address)
                 .setPorts(Integer.parseInt(bootstrapPort)).start();
+
         futureDiscover.awaitUninterruptibly();
 
         if (futureDiscover.isSuccess()) {
-           // System.out.println("found that my outside address is " + futureDiscover.getPeerAddress());
+          log.info("found that my outside address is " + futureDiscover.getPeerAddress());
         } else {
-            System.out.println("failed " + futureDiscover.getFailedReason());
+           log.error("failed " + futureDiscover.getFailedReason());
         }
 
         FutureBootstrap futureBootstrap = peer.bootstrap().setInetAddress(address)

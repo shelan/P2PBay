@@ -101,7 +101,6 @@ public class P2PSellingTest {
             Assert.assertEquals(user.getSellingItems().size(), 1);
             Assert.assertEquals(user.getSellingItems().get(0), baseItemName + i);
 
-
         }
     }
 

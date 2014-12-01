@@ -57,8 +57,9 @@ public class UserCountWorker extends Thread {
                 //System.out.println("Sending request from " + peer);
 
                 GossipObject dataHolder = userInfoRepo.getinfoHolder();
+
                 if(log.isDebugEnabled())
-                System.out.println(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
+                log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
                             dataHolder.getWeight() + " user count --> "+
                             dataHolder.getCount()/ dataHolder.getWeight());
 

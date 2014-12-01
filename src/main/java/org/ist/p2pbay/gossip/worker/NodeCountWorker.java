@@ -61,6 +61,7 @@ public class NodeCountWorker extends Thread {
                     //System.out.println("Sending request from " + peer);
 
                     GossipObject dataHolder = infoRepo.getinfoHolder();
+
                     if(log.isDebugEnabled())
                    log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
                             dataHolder.getWeight() + "node count --> "+

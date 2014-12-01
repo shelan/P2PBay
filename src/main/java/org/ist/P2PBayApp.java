@@ -8,7 +8,7 @@ import org.ist.p2pbay.data.Item;
 import org.ist.p2pbay.data.User;
 import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.gossip.GossipManager;
-import org.ist.p2pbay.info.NodeCounter;
+import org.ist.p2pbay.info.StatPublisher;
 import org.ist.p2pbay.manager.*;
 
 import java.io.Console;
@@ -53,11 +53,10 @@ public class P2PBayApp {
     //private void bootstrap(String bootstrapIp, String bootstrapPort, String currentPort ) throws Exception{
     public void bootstrap(String bootstrapIp, String bootstrapPort, String currentPort) throws Exception {
         //Node joins the network
+        log.info("Bootstrapping p2p app ..");
+
         //args[0] :node-id, args[1]:bootstrap-ip-address, node2:bootstrap port, node3:currentport
         peer = getNetworkManager().bootstrapNode(bootstrapIp, bootstrapPort, currentPort);
-
-        Thread statCounter = new NodeCounter(getPeer());
-        // statCounter.start();
 
         this.gossipManager = new GossipManager(peer);
         this.userManager = new UserManager(peer,gossipManager);
@@ -67,11 +66,15 @@ public class P2PBayApp {
 
         gossipManager.runGossip();
 
+        Thread statPublisher = new StatPublisher(getPeer(),gossipManager);
+        statPublisher.start();
+
         //remove this during production
 
         /*if ("127.0.0.1".equals(bootstrapIp) && "4000".equals(bootstrapPort) && "4000".equals(currentPort)) {
             TempUtil.addUser(getUserManager());
         }*/
+        log.info("P2P App is started ..");
     }
 
     public void shutDown(){
