@@ -88,16 +88,12 @@ public class GossipManager {
 
     public void runGossip() {
 
-        System.out.println("Starting gossiping");
-
         nodeCountWorker = new NodeCountWorker(peer, nodeInfoRepo);
         userCountWorker = new UserCountWorker(peer, userInfoRepo);
         itemCountWorker = new ItemCountWorker(peer, itemInfoRepo);
         nodeCountWorker.start();
         userCountWorker.start();
         itemCountWorker.start();
-
-        System.out.println("leaving gossiping");
 
     }
 
