@@ -68,6 +68,10 @@ public class UserCountWorker extends Thread {
                 FutureResponse futureResponse = peer.sendDirect(address).setObject(message).start();
                 futureResponse.awaitUninterruptibly();
 
+                if(!"OK".equals(futureResponse.getResponse().getType().name())) {
+                    userInfoRepo.mergeGossipObject(message.getGossipObject());
+                }
+
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {

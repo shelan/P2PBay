@@ -63,7 +63,7 @@ public class NodeCountWorker extends Thread {
                     GossipObject dataHolder = infoRepo.getinfoHolder();
 
                     if(log.isDebugEnabled())
-                   log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
+                    log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
                             dataHolder.getWeight() + "node count --> "+
                             dataHolder.getCount()/ dataHolder.getWeight());
 
@@ -72,6 +72,10 @@ public class NodeCountWorker extends Thread {
                     FutureResponse futureResponse = peer.sendDirect(address).setObject(message).start();
                     futureResponse.awaitUninterruptibly();
 
+                    //rollback message if not successful
+                    if(!"OK".equals(futureResponse.getResponse().getType().name())) {
+                        infoRepo.mergeGossipObject(message.getGossipObject());
+                    }
                     try {
                         Thread.sleep(200);
                     } catch (InterruptedException e) {
@@ -81,7 +85,6 @@ public class NodeCountWorker extends Thread {
                 }
             }
         }
-
     }
 
     public boolean isStop() {
