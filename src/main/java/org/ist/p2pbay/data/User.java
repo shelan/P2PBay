@@ -28,7 +28,7 @@ public class User implements Serializable {
     private String name;
     private byte[] password;
     private List<String> sellingItems = new Vector<String>();
-    private Map<String, Double> badeItems = new Hashtable<String, Double>(); //ItemID, bade amount
+    private Map<String, String> badeItems = new Hashtable<String, String>(); //ItemID, bade amount
     private Map<String, Double> purchasedItems = new Hashtable<String, Double>(); //ItemID, amount
 
     public User(String name, byte[] password) {
@@ -64,12 +64,17 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Map<String, Double> getBadeItems() {
+    public Map<String, String> getBadeItems() {
         return badeItems;
     }
 
     public void addBadeItems(String itemID, double amount) {
-        badeItems.put(itemID, amount);
+        if(badeItems.get(itemID) == null) {
+            badeItems.put(itemID, String.valueOf(amount));
+        } else {
+            String allBids = badeItems.get(itemID).concat(" | ").concat(String.valueOf(amount));
+            badeItems.put(itemID, allBids);
+        }
     }
 
     public void removeFromBadeItems(String itemId){

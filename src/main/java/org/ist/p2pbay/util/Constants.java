@@ -17,4 +17,5 @@ public class Constants {
     public static final String CHARSET_NAME_UTF_8 = "UTF-8";
 
     public static final String EXIT = "Y";
+    public static final String ADMIN_PASSWORD = "adminPassword";
 }

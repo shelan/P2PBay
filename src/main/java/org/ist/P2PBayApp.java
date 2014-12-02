@@ -8,12 +8,12 @@ import org.ist.p2pbay.data.Item;
 import org.ist.p2pbay.data.User;
 import org.ist.p2pbay.exception.P2PBayException;
 import org.ist.p2pbay.gossip.GossipManager;
+import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.info.StatPublisher;
 import org.ist.p2pbay.manager.*;
 import org.ist.p2pbay.util.UI;
 
 import java.io.Console;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class P2PBayApp {
     }
 
     private void startConsoleApp() {
-        new UI(this).launchUI();
+        new UI(this).launchMainMenuUI();
     }
 
     //private void bootstrap(String bootstrapIp, String bootstrapPort, String currentPort ) throws Exception{
@@ -158,6 +158,7 @@ public class P2PBayApp {
 
             salesManager.removeItem(itemTitle);
             searchManager.removeItemFromKeywordObjects(itemTitle);
+            //TODO remove from gossip???? but as per tests remove item should do
         }
         return bidInfo;
     }
@@ -166,12 +167,12 @@ public class P2PBayApp {
         return bidManager.getBidList(itemName);
     }
 
-    public Map<String, Double> getUserBidHistory(String userName) {
+    public Map<String, String> getUserBidHistory(String userName) {
         User user = userManager.getUser(userName);
         if( user!= null) {
             return user.getBadeItems();
         }
-        return new Hashtable<String, Double>();
+        return new Hashtable<String, String>();
     }
 
     public Map<String, Double> getUserPurchasedHistory(String userName) {
@@ -180,6 +181,21 @@ public class P2PBayApp {
             return user.getPurchasedItems();
         }
         return new Hashtable<String, Double>();
+    }
+
+    public int getNodeCount() {
+        GossipObject gossipObject = gossipManager.getNodeInfoRepo().getinfoHolder();
+        return (int)Math.round(gossipObject.getCount()/gossipObject.getWeight());
+    }
+
+    public int getItemCount() {
+        GossipObject gossipObject = gossipManager.getItemInfoRepo().getinfoHolder();
+        return (int)Math.round(gossipObject.getCount()/gossipObject.getWeight());
+    }
+
+    public int getUserCount() {
+        GossipObject gossipObject = gossipManager.getUserInfoRepo().getinfoHolder();
+        return (int)Math.round(gossipObject.getCount()/gossipObject.getWeight());
     }
 
     public SalesManager getSalesManager() {
