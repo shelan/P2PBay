@@ -16,6 +16,7 @@
 
 package org.ist.p2pbay.gossip;
 
+import net.tomp2p.futures.FutureResponse;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.PeerAddress;
 import net.tomp2p.rpc.ObjectDataReply;
@@ -30,6 +31,10 @@ import org.ist.p2pbay.gossip.repository.InformationRepository;
 import org.ist.p2pbay.gossip.worker.ItemCountWorker;
 import org.ist.p2pbay.gossip.worker.NodeCountWorker;
 import org.ist.p2pbay.gossip.worker.UserCountWorker;
+import org.ist.p2pbay.util.Constants;
+
+import java.util.List;
+import java.util.Random;
 
 
 public class GossipManager {
@@ -97,10 +102,19 @@ public class GossipManager {
 
     }
 
-    public void stopGossip(){
+    public void stopGossip() {
+       // handoverNodeCountInfo();
+        nodeCountWorker.setStop(true);
+    }
 
-            nodeCountWorker.setStop(true);
-
+    private void handoverNodeCountInfo() {
+        List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
+        if (peerAddressList.size() > 0) {
+            PeerAddress address1 = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
+            NodeCountMessage nodeCountMessage = new NodeCountMessage(nodeInfoRepo.getInfoToHandover(Constants.HANDOVER_TYPE_NODE));
+            FutureResponse futureResponse1 = peer.sendDirect(address1).setObject(nodeCountMessage).start();
+            futureResponse1.awaitUninterruptibly();
+        }
     }
 
     private void setupReplyHandlers() {

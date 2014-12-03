@@ -17,6 +17,7 @@
 package org.ist.p2pbay.gossip.repository;
 
 import org.ist.p2pbay.gossip.GossipObject;
+import org.ist.p2pbay.util.Constants;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -28,7 +29,7 @@ public class InformationRepository {
     
     GossipObject infoHolder;
     Lock lock = new ReentrantLock();
-    
+
     public GossipObject getinfoHolder() {
         return infoHolder;
     }
@@ -67,6 +68,24 @@ public class InformationRepository {
             this.infoHolder.setWeight(currentWeight + gossipObject.getWeight());
         }finally {
            lock.unlock();
+        }
+    }
+
+    public GossipObject getInfoToHandover(int type) {
+        lock.lock();
+        try {
+            switch (type) {
+                case Constants.HANDOVER_TYPE_NODE:
+                    infoHolder.setCount(infoHolder.getCount() -1 );
+                    infoHolder.setWeight(infoHolder.getWeight());
+                    return infoHolder;
+
+                default:
+                    return null;
+            }
+        }
+        finally {
+            lock.unlock();
         }
     }
 }

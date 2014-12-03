@@ -119,6 +119,7 @@ public class SearchManager {
     }
 
     public String[] getMatchingItems(String keyword1, String keyword2, Character operation) {
+        //TODO do this paralally....
         String[] result1 = getMatchingItems(keyword1);
         String[] result2 = getMatchingItems(keyword2);
         Set resultSet1;

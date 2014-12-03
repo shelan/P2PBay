@@ -48,15 +48,14 @@ public class P2PBayApp {
         }
 
         P2PBayApp app = new P2PBayApp();
-        //app.bootstrap(args[0], args[1], args[2]);
         app.bootstrap(args[0], args[1], args[2]);
 
-        RestAPI restAPI = new RestAPI(app);
-        restAPI.startRestApi();
+        if(Boolean.valueOf(args[3])) {
+            RestAPI restAPI = new RestAPI(app);
+            restAPI.startRestApi();
+        }
 
         app.startConsoleApp();
-
-
     }
 
     private void startConsoleApp() {

@@ -19,4 +19,6 @@ public class Constants {
 
     public static final String EXIT = "Y";
     public static final String ADMIN_PASSWORD = "adminPassword";
+
+    public static final int HANDOVER_TYPE_NODE = 1;
 }
