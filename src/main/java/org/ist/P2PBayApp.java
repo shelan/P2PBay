@@ -11,7 +11,7 @@ import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.info.StatPublisher;
 import org.ist.p2pbay.manager.*;
-import org.ist.p2pbay.rest.RestAPI;
+import org.ist.p2pbay.rest.RestAPi;
 import org.ist.p2pbay.util.UI;
 
 import java.io.Console;
@@ -51,7 +51,7 @@ public class P2PBayApp {
         app.bootstrap(args[0], args[1], args[2]);
 
         if(Boolean.valueOf(args[3])) {
-            RestAPI restAPI = new RestAPI(app);
+            RestAPi restAPI = new RestAPi(app);
             restAPI.startRestApi();
             Thread statPublisher = new StatPublisher(app.peer ,app.gossipManager);
             statPublisher.start();
