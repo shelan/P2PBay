@@ -21,7 +21,7 @@ public class RestAPI {
     }
 
     public void startRestApi() {
-        setPort(8000);
+        setPort(4567);
 
         get(new Route("/node/stop") {
             @Override
