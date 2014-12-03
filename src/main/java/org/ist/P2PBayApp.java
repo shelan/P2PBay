@@ -53,6 +53,8 @@ public class P2PBayApp {
         if(Boolean.valueOf(args[3])) {
             RestAPI restAPI = new RestAPI(app);
             restAPI.startRestApi();
+            Thread statPublisher = new StatPublisher(app.peer ,app.gossipManager);
+            statPublisher.start();
         }
 
         app.startConsoleApp();
@@ -78,8 +80,6 @@ public class P2PBayApp {
 
         gossipManager.runGossip();
 
-        Thread statPublisher = new StatPublisher(getPeer(),gossipManager);
-        //statPublisher.start();
 
         //remove this during production
 
