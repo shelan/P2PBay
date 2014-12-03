@@ -36,6 +36,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 public class P2PSellingTest {
 
@@ -125,7 +126,8 @@ public class P2PSellingTest {
 
 
         Assert.assertEquals(bidManager.getBidCount(baseItemName + 1), 100);
-        Assert.assertEquals(userManager.getUser(baseUserName + 3).getBadeItems().get("item1"), 1.0 + 1.0 * 3);
+        Vector<Double> amounts = userManager.getUser(baseUserName + 3).getBadeItems().get("item1");
+        Assert.assertEquals(amounts.get(0), 1.0 + 1.0 * 3);
 
 
         salesManager.closeAuction(baseUserName +1, baseItemName + 1);

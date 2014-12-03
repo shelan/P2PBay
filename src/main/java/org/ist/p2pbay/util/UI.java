@@ -13,10 +13,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by ashansa on 12/1/14.
@@ -360,12 +357,16 @@ public class UI {
     }
 
     private void viewBidHistory(String userName) {
-        Map<String, String> bidHistory = app.getUserBidHistory(userName);
+        Map<String, Vector> bidHistory = app.getUserBidHistory(userName);
         if(bidHistory!= null && bidHistory.size() > 0) {
             System.out.println("\nBid History:");
             for (String itemTitle : bidHistory.keySet()) {
                 System.out.println("  Item: " + itemTitle);
-                System.out.println("  Bid amount: " + bidHistory.get(itemTitle) + "\n");
+                Vector<Double> badeAmounts = bidHistory.get(itemTitle);
+                for (Double badeAmount : badeAmounts) {
+                    System.out.println("  Bid amount: " + badeAmount+ "\n");
+                }
+
             }
         } else {
             System.out.println("\nYou do not have any pending bids.");

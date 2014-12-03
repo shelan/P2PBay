@@ -18,6 +18,7 @@ import java.io.Console;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * Main Application
@@ -93,7 +94,6 @@ public class P2PBayApp {
         try {
             log.info("Shutting down node ...!!!");
             gossipManager.stopGossip();
-            Thread.sleep(5000);
             peer.shutdown();
         } catch (Exception e) {
            log.error("Error while shutting down the peer",e);
@@ -176,12 +176,12 @@ public class P2PBayApp {
         return bidManager.getBidList(itemName);
     }
 
-    public Map<String, String> getUserBidHistory(String userName) {
+    public Map<String, Vector> getUserBidHistory(String userName) {
         User user = userManager.getUser(userName);
         if( user!= null) {
             return user.getBadeItems();
         }
-        return new Hashtable<String, String>();
+        return new Hashtable<String, Vector>();
     }
 
     public Map<String, Double> getUserPurchasedHistory(String userName) {
