@@ -13,10 +13,10 @@ import java.security.MessageDigest;
 import static spark.Spark.get;
 import static spark.Spark.setPort;
 
-public class RestAPI {
+public class RestAPi {
     P2PBayApp app;
 
-    public RestAPI(P2PBayApp app) {
+    public RestAPi(P2PBayApp app) {
         this.app = app;
     }
 
