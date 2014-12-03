@@ -290,17 +290,15 @@ public class UI {
     }
 
     private void search() {
-        String keyword = console.readLine("\nEnter keyword:");
+        String keywordString = console.readLine("\nEnter keyword:");
         String[] resultItems;
 
-        if (keyword.contains(String.valueOf(Constants.AND_OPERATION))) {
-            resultItems = app.advanceSearch(keyword.split(String.valueOf(Constants.AND_OPERATION))[0].trim(),
-                    keyword.split(String.valueOf(Constants.AND_OPERATION))[1].trim(), Constants.AND_OPERATION);
-        } else if (keyword.contains(String.valueOf(Constants.OR_OPERATION))) {
-            resultItems = app.advanceSearch(keyword.split(String.valueOf("\\" + Constants.OR_OPERATION))[0].trim(),
-                    keyword.split(String.valueOf("\\" + Constants.OR_OPERATION))[1].trim(), Constants.OR_OPERATION);
+        if(keywordString.contains(String.valueOf(Constants.AND_OPERATION)) || keywordString.contains(String.valueOf(Constants.OR_OPERATION))) {
+            char operation = keywordString.trim().charAt(0);
+            String[] keywords = keywordString.substring(1).trim().split(" ");
+            resultItems = app.advanceSearch(keywords, operation);
         } else {
-            resultItems = app.simpleSearch(keyword);
+            resultItems = app.simpleSearch(keywordString);
         }
 
         if (resultItems != null && resultItems.length > 0) {
@@ -309,7 +307,7 @@ public class UI {
                 System.out.println("  " + itemTitle);
             }
         } else {
-            System.out.println("No items found for keywords: " + keyword);
+            System.out.println("No items found for keywords: " + keywordString);
         }
     }
 

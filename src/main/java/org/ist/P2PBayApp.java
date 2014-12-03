@@ -143,8 +143,8 @@ public class P2PBayApp {
         return items;
     }
 
-    public String[] advanceSearch(String keyword1, String keyword2, char operator){
-        String []  items = searchManager.getMatchingItems(keyword1, keyword2, operator);
+    public String[] advanceSearch(String[] keywords, char operator){
+        String []  items = searchManager.getMatchingItems(keywords, operator);
         return items;
     }
 

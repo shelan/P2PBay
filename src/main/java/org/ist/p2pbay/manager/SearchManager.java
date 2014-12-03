@@ -115,11 +115,42 @@ public class SearchManager {
         if( keywordObj!= null) {
             return keywordObj.getItems().toArray(new String[keywordObj.getItems().size()]);
         }
-        return null;
+        return new String[0];
+    }
+
+    public String[] getMatchingItems(String[] keywords, Character operation) {
+        Set<String> resultSet = new HashSet<String>();
+        if(keywords != null && keywords.length > 0) {
+            for (int i = 0; i < keywords.length ; i++) {
+                Set result1;
+                Set result2;
+
+                if(i == 0) {
+                    result1 = new HashSet(Arrays.asList(getMatchingItems(keywords[i])));
+                    result2 = new HashSet(Arrays.asList(getMatchingItems(keywords[i+1])));
+                    i++;
+                } else {
+                    result1 = resultSet;
+                    result2 = new HashSet(Arrays.asList(getMatchingItems(keywords[i])));
+                }
+                switch (operation) {
+                    case Constants.AND_OPERATION:
+                        result1.retainAll(result2);
+                        resultSet = result1;
+                        break;
+
+                    case Constants.OR_OPERATION:
+                        result1.addAll(result2);
+                        resultSet = result1;
+                        break;
+                }
+
+            }
+        }
+        return (String[])resultSet.toArray(new String[resultSet.size()]);
     }
 
     public String[] getMatchingItems(String keyword1, String keyword2, Character operation) {
-        //TODO do this paralally....
         String[] result1 = getMatchingItems(keyword1);
         String[] result2 = getMatchingItems(keyword2);
         Set resultSet1;
