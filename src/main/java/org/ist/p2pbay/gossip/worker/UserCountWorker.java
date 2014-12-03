@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.gossip.message.UserCountMessage;
 import org.ist.p2pbay.gossip.repository.InformationRepository;
+import org.ist.p2pbay.util.Constants;
 
 import java.util.List;
 import java.util.Random;
@@ -51,6 +52,12 @@ public class UserCountWorker extends Thread {
         }
 
         while (!stop) {
+            try {
+                Thread.sleep(Constants.GOSSIP_FREQUENCY_IN_MS);
+            } catch (InterruptedException e) {
+                log.error("interrupted ",e);
+            }
+
             List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
             if (peerAddressList.size() > 0) {
                 PeerAddress address = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
@@ -72,11 +79,7 @@ public class UserCountWorker extends Thread {
                     userInfoRepo.mergeGossipObject(message.getGossipObject());
                 }
 
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    log.error("interrupted ",e);
-                }
+
 
             }
         }

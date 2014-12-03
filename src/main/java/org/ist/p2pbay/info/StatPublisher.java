@@ -49,10 +49,12 @@ public class StatPublisher extends Thread{
               GossipObject nodeInfo = gossipManager.getNodeInfoRepo().getinfoHolder();
               GossipObject userInfo = gossipManager.getUserInfoRepo().getinfoHolder();
 
-                System.out.println(("Node count : ---------> " +nodeInfo.getCount()/nodeInfo.getWeight()));
+                System.out.println(("count " +nodeInfo.getCount()+" weight "+nodeInfo.getWeight()+" peer "+peer.getPeerAddress().portTCP()));
+
+               /* System.out.println(("Node count : ---------> " +nodeInfo.getCount()/nodeInfo.getWeight()));
                 System.out.println("User count : ---------> " + userInfo.getCount() / userInfo.getWeight());
                 System.out.println("Item count : ---------> " + itemInfo.getCount() / itemInfo.getWeight());
-                System.out.println("\n");
+                System.out.println("\n");*/
 
 
             } catch (InterruptedException e) {

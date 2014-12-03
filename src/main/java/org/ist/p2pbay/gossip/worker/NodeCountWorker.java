@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.gossip.message.NodeCountMessage;
 import org.ist.p2pbay.gossip.repository.InformationRepository;
+import org.ist.p2pbay.util.Constants;
 
 import java.util.List;
 import java.util.Random;
@@ -55,6 +56,13 @@ public class NodeCountWorker extends Thread {
             }
 
             while (!stop) {
+
+                try {
+                    Thread.sleep(Constants.GOSSIP_FREQUENCY_IN_MS);
+                } catch (InterruptedException e) {
+                    log.error("interrupted ", e);
+                }
+
                 List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
                 if (peerAddressList.size() > 0) {
                     PeerAddress address = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
@@ -63,9 +71,9 @@ public class NodeCountWorker extends Thread {
                     GossipObject dataHolder = infoRepo.getinfoHolder();
 
                     if(log.isDebugEnabled())
-                    log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :"+
-                            dataHolder.getWeight() + "node count --> "+
-                            dataHolder.getCount()/ dataHolder.getWeight());
+                    log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :" +
+                            dataHolder.getWeight() + "node count --> " +
+                            dataHolder.getCount() / dataHolder.getWeight());
 
                     NodeCountMessage message = new NodeCountMessage(infoRepo.sliceGossipObject());
 
@@ -77,7 +85,7 @@ public class NodeCountWorker extends Thread {
                         infoRepo.mergeGossipObject(message.getGossipObject());
                     }
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(Constants.GOSSIP_FREQUENCY_IN_MS);
                     } catch (InterruptedException e) {
                        log.error("interrupted ",e);
                     }

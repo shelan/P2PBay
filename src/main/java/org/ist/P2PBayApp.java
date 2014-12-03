@@ -11,6 +11,7 @@ import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.info.StatPublisher;
 import org.ist.p2pbay.manager.*;
+import org.ist.p2pbay.rest.RestAPI;
 import org.ist.p2pbay.util.UI;
 
 import java.io.Console;
@@ -44,10 +45,17 @@ public class P2PBayApp {
             System.out.println("Should provide >> String bootstrapIp, String bootstrapPort, String currentPort ");
             return;
         }
+
         P2PBayApp app = new P2PBayApp();
         //app.bootstrap(args[0], args[1], args[2]);
         app.bootstrap(args[0], args[1], args[2]);
+
+        RestAPI restAPI = new RestAPI(app);
+        restAPI.startRestApi();
+
         app.startConsoleApp();
+
+
     }
 
     private void startConsoleApp() {
@@ -83,6 +91,7 @@ public class P2PBayApp {
 
     public void shutDown(){
         try {
+            log.info("Shutting down node ...!!!");
             gossipManager.stopGossip();
             Thread.sleep(5000);
             peer.shutdown();

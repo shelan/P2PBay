@@ -30,7 +30,7 @@ public class GossipTestRunner {
 
         GossipTestRunner testRunner = new GossipTestRunner();
         NodeRepository nodeRepository = new NodeRepository();
-        appList = nodeRepository.createAppNetWork(20);
+        appList = nodeRepository.createAppNetWork(5);
 
         Thread.sleep(5000);
 
