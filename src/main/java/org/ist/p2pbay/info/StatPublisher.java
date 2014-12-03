@@ -11,20 +11,20 @@ import org.ist.p2pbay.gossip.GossipObject;
 /**
  * Created by shelan on 11/25/14.
  */
-public class StatPublisher extends Thread{
+public class StatPublisher extends Thread {
 
     Peer peer;
     GossipManager gossipManager;
     private static Log log = LogFactory.getLog(StatPublisher.class);
 
-    public StatPublisher(Peer peer, GossipManager gossipManager){
+    public StatPublisher(Peer peer, GossipManager gossipManager) {
         this.peer = peer;
         this.gossipManager = gossipManager;
 
         peer.getPeerBean().getPeerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
             @Override
             public void peerInserted(PeerAddress peerAddress) {
-               log.info("peer added " + peerAddress.toString());
+                log.info("peer added " + peerAddress.toString());
             }
 
             @Override
@@ -34,7 +34,7 @@ public class StatPublisher extends Thread{
 
             @Override
             public void peerUpdated(PeerAddress peerAddress) {
-              log.info("peer updated " + peerAddress.toString());
+                log.info("peer updated " + peerAddress.toString());
             }
 
         });
@@ -42,14 +42,16 @@ public class StatPublisher extends Thread{
 
     @Override
     public void run() {
-        while (true){
+        while (true) {
             try {
                 Thread.sleep(3000);
-              GossipObject itemInfo = gossipManager.getItemInfoRepo().getinfoHolder();
-              GossipObject nodeInfo = gossipManager.getNodeInfoRepo().getinfoHolder();
-              GossipObject userInfo = gossipManager.getUserInfoRepo().getinfoHolder();
+                GossipObject itemInfo = gossipManager.getItemInfoRepo().getinfoHolder();
+                GossipObject nodeInfo = gossipManager.getNodeInfoRepo().getinfoHolder();
+                GossipObject userInfo = gossipManager.getUserInfoRepo().getinfoHolder();
 
-                System.out.println(("count " +nodeInfo.getCount()+" weight "+nodeInfo.getWeight()+" peer "+peer.getPeerAddress().portTCP()));
+                log.info(("node count " + nodeInfo.getCount() + "/ weight " + nodeInfo.getWeight() + " = " + nodeInfo.getCount() / nodeInfo.getWeight()));
+                log.info(("item count " + itemInfo.getCount() + "/ weight " + nodeInfo.getWeight() + " = " + itemInfo.getCount() / itemInfo.getWeight()));
+                log.info(("user count " + userInfo.getCount() + "/ weight " + nodeInfo.getWeight() + " = " + userInfo.getCount() / userInfo.getWeight()));
 
                /* System.out.println(("Node count : ---------> " +nodeInfo.getCount()/nodeInfo.getWeight()));
                 System.out.println("User count : ---------> " + userInfo.getCount() / userInfo.getWeight());
