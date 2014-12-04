@@ -155,11 +155,13 @@ public class SalesManager {
             gossipObject.setCount(1.0);
             gossipObject.setWeight(0.0);
             gossipManager.getItemInfoRepo().mergeGossipObject(gossipObject);
+            gossipManager.getItemInfoRepo().incrementCounter();
         }else {
             GossipObject gossipObject = new GossipObject();
             gossipObject.setCount(-1.0);
             gossipObject.setWeight(0.0);
             gossipManager.getItemInfoRepo().mergeGossipObject(gossipObject);
+            gossipManager.getItemInfoRepo().decrementCounter();
         }
     }
 

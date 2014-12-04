@@ -107,4 +107,12 @@ public class InformationRepository {
             lock.unlock();
         }
     }
+
+    public void incrementCounter(){
+        totalCount.getAndIncrement();
+    }
+
+    public void decrementCounter(){
+        totalCount.getAndDecrement();
+    }
 }

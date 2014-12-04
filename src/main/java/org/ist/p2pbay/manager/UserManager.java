@@ -139,11 +139,13 @@ public class UserManager {
             gossipObject.setCount(1.0);
             gossipObject.setWeight(0.0);
             gossipManager.getUserInfoRepo().mergeGossipObject(gossipObject);
+            gossipManager.getUserInfoRepo().incrementCounter();
         } else {
             GossipObject gossipObject = new GossipObject();
             gossipObject.setCount(-1.0);
             gossipObject.setWeight(0.0);
             gossipManager.getUserInfoRepo().mergeGossipObject(gossipObject);
+            gossipManager.getUserInfoRepo().decrementCounter();
         }
     }
 }
