@@ -150,43 +150,6 @@ public class SearchManager {
         return (String[])resultSet.toArray(new String[resultSet.size()]);
     }
 
-    public String[] getMatchingItems(String keyword1, String keyword2, Character operation) {
-        String[] result1 = getMatchingItems(keyword1);
-        String[] result2 = getMatchingItems(keyword2);
-        Set resultSet1;
-        Set resultSet2;
-        Set finalResult = new HashSet();
-
-        if(result1 != null && result2 != null) {
-            resultSet1 = new HashSet(Arrays.asList(result1));
-            resultSet2 = new HashSet(Arrays.asList(result2));
-
-            switch (operation) {
-                case Constants.AND_OPERATION:
-                    resultSet1.retainAll(resultSet2);
-                    finalResult = resultSet1;
-                    break;
-
-                case Constants.OR_OPERATION:
-                    resultSet1.addAll(resultSet2);
-                    finalResult = resultSet1;
-                    break;
-            }
-
-            if(finalResult.size() > 0) {
-                return (String[])finalResult.toArray(new String[finalResult.size()]);
-            } else {
-                return null;
-            }
-        } else if(Constants.AND_OPERATION == operation){
-            // we have results only for one KEYWORD_DOMAIN. So & operation won't have any results
-            return null;
-        } else {
-            // only one KEYWORD_DOMAIN has results and operation is |. So send the results retrieved
-            return result1 != null ? result1 : result2;
-        }
-    }
-
     private Keyword getKeywordObject(String keyword) {
         try {
             FutureDHT futureDHT = peer.get(Number160.createHash(keyword)).

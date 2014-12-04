@@ -106,6 +106,10 @@ public class UI {
     private boolean registerUser() {
         boolean newAccountCreated = false;
         String userName = console.readLine("\nEnter a username: ");
+        if(app.getUser(userName) != null) {
+            System.out.println("Username already exists. Please try again with a different username");
+            return newAccountCreated;
+        }
         String password = String.valueOf(console.readPassword("Enter password: "));
         String confPassword = String.valueOf(console.readPassword("Re enter password: "));
         if (!password.equals(confPassword)) {
@@ -270,6 +274,10 @@ public class UI {
             if (console != null) {
                 System.out.println("\n------Please enter details to create an Item -----");
                 itemTitle = console.readLine("Item Title:");
+                if(app.getItem(itemTitle) != null) {
+                    System.out.println("Item with the same title already exists. Please try again with a different title");
+                    return;
+                }
                 itemDesc = console.readLine("Item Description:");
                 app.addItem(itemTitle, itemDesc, userName);
 
