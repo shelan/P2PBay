@@ -53,8 +53,8 @@ public class StatPublisher extends Thread {
 
                 log.info("peers in peer map -----> "+peer.getPeerBean().getPeerMap().size());
                 log.info(("node count " + nodeInfo.getCount() + "/ weight " + nodeInfo.getWeight() + " = " + nodeInfo.getCount() / nodeInfo.getWeight()));
-                log.info(("item count " + itemInfo.getCount() + "/ weight " + nodeInfo.getWeight() + " = " + itemInfo.getCount() / itemInfo.getWeight()));
-                log.info(("user count " + userInfo.getCount() + "/ weight " + nodeInfo.getWeight() + " = " + userInfo.getCount() / userInfo.getWeight()));
+                log.info(("item count " + itemInfo.getCount() + "/ weight " + itemInfo.getWeight() + " = " + itemInfo.getCount() / itemInfo.getWeight()));
+                log.info(("user count " + userInfo.getCount() + "/ weight " + userInfo.getWeight() + " = " + userInfo.getCount() / userInfo.getWeight()));
 
                /* System.out.println(("Node count : ---------> " +nodeInfo.getCount()/nodeInfo.getWeight()));
                 System.out.println("User count : ---------> " + userInfo.getCount() / userInfo.getWeight());
