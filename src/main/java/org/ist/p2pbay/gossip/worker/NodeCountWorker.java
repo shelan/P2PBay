@@ -55,7 +55,6 @@ public class NodeCountWorker extends Thread {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
 
             while (!isInterrupted()) {
