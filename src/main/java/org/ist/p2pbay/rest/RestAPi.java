@@ -9,6 +9,7 @@ import spark.Response;
 import spark.Route;
 
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 import static spark.Spark.get;
 import static spark.Spark.setPort;
@@ -37,6 +38,7 @@ public class RestAPi {
                 String username = request.params(":username");
                 String password = request.params(":password");
                 MessageDigest messageDigest = null;
+                boolean isSuccessful = false;
                 try {
                     messageDigest = MessageDigest.getInstance(Constants.ALGORITHM_SHA_256);
 
@@ -44,11 +46,15 @@ public class RestAPi {
 
                     byte[] enteredDigest = messageDigest.digest();
 
-                    app.registerUser(username, enteredDigest);
+                    isSuccessful = app.registerUser(username, enteredDigest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return "Created user " + request.params(":username");
+                if(isSuccessful) {
+                    return "Created user " + request.params(":username");
+                } else {
+                    return "User creation failed";
+                }
             }
         });
 
@@ -57,13 +63,17 @@ public class RestAPi {
             public Object handle(Request request, Response response) {
                 String username = request.params(":username");
                 String password = request.params(":password");
-
+                boolean isSuccessful = false;
                 try {
-                    app.login(username, password);
+                    isSuccessful = app.login(username, password);
                 } catch (P2PBayException e1) {
                     e1.printStackTrace();
                 }
-                return "logged in User " + request.params(":username");
+                if(isSuccessful) {
+                    return "logged in User " + request.params(":username");
+                } else {
+                    return "Log in failed";
+                }
             }
         });
 
@@ -73,6 +83,9 @@ public class RestAPi {
                 String user = request.params(":user");
                 String desc = request.params(":desc");
                 String name = request.params(":name");
+                if(name.contains("-")) {
+                    name = name.replace("-"," ");
+                }
 
                 try {
                     app.addItem(name, desc, user);
@@ -95,6 +108,25 @@ public class RestAPi {
             }
         });
 
+        get(new Route("/node/search/:keyword") {
+            @Override
+            public Object handle(Request request, Response response) {
+                String keyword = request.params(":keyword");
+                String[] result = app.simpleSearch(keyword);
+                return (Arrays.toString(result));
+            }
+        });
+
+        get(new Route("/node/ad-search/:operator/:keywords") {
+            @Override
+            public Object handle(Request request, Response response) {
+                char operator = request.params(":operator").charAt(0);
+                String keywordString = request.params(":keywords");
+                String[] keywords = keywordString.split(",");
+                String[] result = app.advanceSearch(keywords, operator);
+                return (Arrays.toString(result));
+            }
+        });
 
     }
 }
