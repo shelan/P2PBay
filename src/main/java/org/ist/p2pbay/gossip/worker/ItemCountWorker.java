@@ -49,7 +49,6 @@ public class ItemCountWorker extends Thread {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-           return;
         }
 
         while (!isInterrupted()) {
