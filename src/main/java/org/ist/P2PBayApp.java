@@ -105,6 +105,10 @@ public class P2PBayApp {
         return true;
     }
 
+    public User getUser(String userName) {
+        return userManager.getUser(userName);
+    }
+
     public boolean login (String userName, String password) throws P2PBayException {
        return userManager.login(userName,password);
     }
