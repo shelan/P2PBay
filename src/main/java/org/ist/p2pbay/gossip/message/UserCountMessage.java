@@ -20,8 +20,9 @@ import org.ist.p2pbay.gossip.GossipObject;
 
 public class UserCountMessage extends GossipMessage {
 
-    public UserCountMessage(GossipObject gossipObject) {
+    public UserCountMessage(GossipObject gossipObject, int gossipRound) {
         setGossipObject(gossipObject);
+        this.setGossipRound(gossipRound);
     }
 
     @Override

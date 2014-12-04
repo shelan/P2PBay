@@ -21,8 +21,9 @@ import org.ist.p2pbay.gossip.GossipObject;
 
 public class NodeCountMessage extends GossipMessage {
 
-    public NodeCountMessage(GossipObject gossipObject) {
+    public NodeCountMessage(GossipObject gossipObject, int gossipRound) {
         setGossipObject(gossipObject);
+        this.setGossipRound(gossipRound);
     }
 
     public MessageType getMSGType() {

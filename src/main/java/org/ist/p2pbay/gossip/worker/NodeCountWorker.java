@@ -21,6 +21,7 @@ import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.PeerAddress;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.gossip.message.NodeCountMessage;
 import org.ist.p2pbay.gossip.repository.InformationRepository;
@@ -36,13 +37,15 @@ public class NodeCountWorker extends Thread {
 
     private Peer peer;
     private InformationRepository infoRepo;
-    private boolean stop;
     public static final Log log = LogFactory.getLog(NodeCountWorker.class);
+    private boolean isStop = false;
+    private GossipManager manager;
 
-    public NodeCountWorker(Peer peer, InformationRepository infoRepo) {
+    public NodeCountWorker(Peer peer, InformationRepository infoRepo, GossipManager manager) {
         this.peer = peer;
         this.infoRepo = infoRepo;
-        this.stop = false;
+        this.manager = manager;
+
     }
 
     @Override
@@ -55,12 +58,11 @@ public class NodeCountWorker extends Thread {
                 e.printStackTrace();
             }
 
-            while (!stop) {
-
+            while (!isInterrupted()) {
                 try {
                     Thread.sleep(Constants.GOSSIP_FREQUENCY_IN_MS);
                 } catch (InterruptedException e) {
-                    log.error("interrupted ", e);
+                    return;
                 }
 
                 List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
@@ -70,24 +72,20 @@ public class NodeCountWorker extends Thread {
 
                     GossipObject dataHolder = infoRepo.getinfoHolder();
 
-                    if(log.isDebugEnabled())
-                    log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :" +
-                            dataHolder.getWeight() + "node count --> " +
-                            dataHolder.getCount() / dataHolder.getWeight());
+                    if (log.isDebugEnabled())
+                        log.debug(" @ sender current count: " + dataHolder.getCount() + "current weight :" +
+                                dataHolder.getWeight() + "node count --> " +
+                                dataHolder.getCount() / dataHolder.getWeight());
 
-                    NodeCountMessage message = new NodeCountMessage(infoRepo.sliceGossipObject());
+                    NodeCountMessage message = new NodeCountMessage(infoRepo.sliceGossipObject(),
+                            manager.getGossipRound().get());
 
                     FutureResponse futureResponse = peer.sendDirect(address).setObject(message).start();
                     futureResponse.awaitUninterruptibly();
 
                     //rollback message if not successful
-                    if(!"OK".equals(futureResponse.getResponse().getType().name())) {
+                    if (!"OK".equals(futureResponse.getResponse().getType().name())) {
                         infoRepo.mergeGossipObject(message.getGossipObject());
-                    }
-                    try {
-                        Thread.sleep(Constants.GOSSIP_FREQUENCY_IN_MS);
-                    } catch (InterruptedException e) {
-                       log.error("interrupted ",e);
                     }
 
                 }
@@ -96,10 +94,10 @@ public class NodeCountWorker extends Thread {
     }
 
     public boolean isStop() {
-        return stop;
+        return isStop;
     }
 
-    public void setStop(boolean stop) {
-        this.stop = stop;
+    public void setStop(boolean isStop) {
+        this.isStop = isStop;
     }
 }

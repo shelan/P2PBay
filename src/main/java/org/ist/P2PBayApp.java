@@ -50,10 +50,13 @@ public class P2PBayApp {
         P2PBayApp app = new P2PBayApp();
         app.bootstrap(args[0], args[1], args[2]);
 
-        if(Boolean.valueOf(args[3])) {
+        if (args.length >= 4 && Boolean.valueOf(args[3])) {
             RestAPi restAPI = new RestAPi(app);
             restAPI.startRestApi();
-            Thread statPublisher = new StatPublisher(app.peer ,app.gossipManager);
+        }
+
+        if (args.length == 5) {
+            Thread statPublisher = new StatPublisher(app.peer, app.gossipManager, Boolean.valueOf(args[4]));
             statPublisher.start();
         }
 
@@ -73,13 +76,12 @@ public class P2PBayApp {
         peer = getNetworkManager().bootstrapNode(bootstrapIp, bootstrapPort, currentPort);
 
         this.gossipManager = new GossipManager(peer);
-        this.userManager = new UserManager(peer,gossipManager);
+        this.userManager = new UserManager(peer, gossipManager);
         this.bidManager = new BidManager(peer);
-        this.salesManager = new SalesManager(peer,bidManager,gossipManager);
+        this.salesManager = new SalesManager(peer, bidManager, gossipManager);
         this.searchManager = new SearchManager(peer);
 
         gossipManager.runGossip();
-
 
         //remove this during production
 
@@ -89,34 +91,34 @@ public class P2PBayApp {
         log.info("P2P App is started ..");
     }
 
-    public void shutDown(){
+    public void shutDown() {
         try {
             log.info("Shutting down node ...!!!");
             gossipManager.stopGossip();
             peer.shutdown();
         } catch (Exception e) {
-           log.error("Error while shutting down the peer",e);
+            log.error("Error while shutting down the peer", e);
         }
     }
 
-    public boolean registerUser(String name,byte[] password) throws P2PBayException {
-        User newUser = new User(name,password);
-        userManager.addUser(name,newUser);
+    public boolean registerUser(String name, byte[] password) throws P2PBayException {
+        User newUser = new User(name, password);
+        userManager.addUser(name, newUser);
         return true;
     }
 
-    public boolean login (String userName, String password) throws P2PBayException {
-       return userManager.login(userName,password);
+    public boolean login(String userName, String password) throws P2PBayException {
+        return userManager.login(userName, password);
     }
 
-    public boolean logout(String userName){
+    public boolean logout(String userName) {
         return userManager.logout(userName);
     }
 
     public void addItem(String title, String description, String user) throws P2PBayException {
-        Item item = new Item(title,user);
+        Item item = new Item(title, user);
         item.setDescription(description);
-        salesManager.addItem(title,item);
+        salesManager.addItem(title, item);
         searchManager.addItemToKeyword(title);
     }
 
@@ -124,13 +126,13 @@ public class P2PBayApp {
         return salesManager.getItem(title);
     }
 
-    public boolean bidItem(String itemName, double amount, String userName) throws P2PBayException{
-        if(bidManager.getHighestBid(itemName).getAmount() >= amount){
+    public boolean bidItem(String itemName, double amount, String userName) throws P2PBayException {
+        if (bidManager.getHighestBid(itemName).getAmount() >= amount) {
             return false;
         }
-        BidInfo bid = new BidInfo(userName,amount);
-        boolean isSuccessful = bidManager.addBid(itemName,bid);
-        if(isSuccessful) {
+        BidInfo bid = new BidInfo(userName, amount);
+        boolean isSuccessful = bidManager.addBid(itemName, bid);
+        if (isSuccessful) {
             User user = userManager.getUser(userName);
             user.addBadeItems(itemName, amount);
             userManager.addUser(userName, user);
@@ -138,13 +140,13 @@ public class P2PBayApp {
         return isSuccessful;
     }
 
-    public String[] simpleSearch(String keyword){
-        String []  items = searchManager.getMatchingItems(keyword);
+    public String[] simpleSearch(String keyword) {
+        String[] items = searchManager.getMatchingItems(keyword);
         return items;
     }
 
-    public String[] advanceSearch(String[] keywords, char operator){
-        String []  items = searchManager.getMatchingItems(keywords, operator);
+    public String[] advanceSearch(String[] keywords, char operator) {
+        String[] items = searchManager.getMatchingItems(keywords, operator);
         return items;
     }
 
@@ -171,13 +173,13 @@ public class P2PBayApp {
         return bidInfo;
     }
 
-    public List <BidInfo> getItemBidHistory(String itemName){
+    public List<BidInfo> getItemBidHistory(String itemName) {
         return bidManager.getBidList(itemName);
     }
 
     public Map<String, Vector> getUserBidHistory(String userName) {
         User user = userManager.getUser(userName);
-        if( user!= null) {
+        if (user != null) {
             return user.getBadeItems();
         }
         return new Hashtable<String, Vector>();
@@ -185,7 +187,7 @@ public class P2PBayApp {
 
     public Map<String, Double> getUserPurchasedHistory(String userName) {
         User user = userManager.getUser(userName);
-        if( user!= null) {
+        if (user != null) {
             return user.getPurchasedItems();
         }
         return new Hashtable<String, Double>();
@@ -193,17 +195,17 @@ public class P2PBayApp {
 
     public int getNodeCount() {
         GossipObject gossipObject = gossipManager.getNodeInfoRepo().getinfoHolder();
-        return (int)Math.round(gossipObject.getCount()/gossipObject.getWeight());
+        return (int) Math.round(gossipObject.getCount() / gossipObject.getWeight());
     }
 
     public int getItemCount() {
         GossipObject gossipObject = gossipManager.getItemInfoRepo().getinfoHolder();
-        return (int)Math.round(gossipObject.getCount()/gossipObject.getWeight());
+        return (int) Math.round(gossipObject.getCount() / gossipObject.getWeight());
     }
 
     public int getUserCount() {
         GossipObject gossipObject = gossipManager.getUserInfoRepo().getinfoHolder();
-        return (int)Math.round(gossipObject.getCount()/gossipObject.getWeight());
+        return (int) Math.round(gossipObject.getCount() / gossipObject.getWeight());
     }
 
     public SalesManager getSalesManager() {

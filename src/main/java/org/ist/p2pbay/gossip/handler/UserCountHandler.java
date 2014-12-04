@@ -17,33 +17,47 @@
 package org.ist.p2pbay.gossip.handler;
 
 
+import net.tomp2p.futures.BaseFuture;
+import net.tomp2p.futures.FutureResponse;
 import net.tomp2p.p2p.Peer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ist.p2pbay.gossip.GossipManager;
 import org.ist.p2pbay.gossip.GossipObject;
 import org.ist.p2pbay.gossip.message.UserCountMessage;
 import org.ist.p2pbay.gossip.repository.InformationRepository;
 
 public class UserCountHandler {
 
+    private GossipManager gossipManager;
     private InformationRepository userInfoRepo;
-    private Peer peer ;
+    private Peer peer;
     public static final Log log = LogFactory.getLog(UserCountHandler.class);
 
 
-    public UserCountHandler(Peer peer, InformationRepository userInfoRepo) {
+    public UserCountHandler(Peer peer, InformationRepository userInfoRepo, GossipManager gossipManager) {
+        this.gossipManager = gossipManager;
         this.peer = peer;
         this.userInfoRepo = userInfoRepo;
     }
 
-    public void handleMessage(UserCountMessage userCountMessage){
-        GossipObject dataHolder = userInfoRepo.getinfoHolder();
-        if(log.isDebugEnabled())
-       log.debug(" @ reciever current count: " + dataHolder.getCount() + "current weight :"+
-                dataHolder.getWeight() + "user count --> "+
-                dataHolder.getCount()/ dataHolder.getWeight());
-        userInfoRepo.mergeGossipObject(userCountMessage.getGossipObject());
+    public BaseFuture.FutureType handleMessage(UserCountMessage userCountMessage) {
 
+        if (userCountMessage.getGossipRound() == gossipManager.getGossipRound().get()) {
+            GossipObject dataHolder = userInfoRepo.getinfoHolder();
+            if (log.isDebugEnabled())
+                log.debug(" @ reciever current count: " + dataHolder.getCount() + "current weight :" +
+                        dataHolder.getWeight() + "user count --> " +
+                        dataHolder.getCount() / dataHolder.getWeight());
+            userInfoRepo.mergeGossipObject(userCountMessage.getGossipObject());
+            return FutureResponse.FutureType.OK;
+        }
+    else if (userCountMessage.getGossipRound() > gossipManager.getGossipRound().get()) {
+        gossipManager.adjustGossip(userCountMessage.getGossipRound());
+        return null;
+    } else {
+        return null;
+    }
 
     }
 }

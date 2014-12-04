@@ -28,6 +28,7 @@ import org.ist.p2pbay.gossip.message.Message;
 import org.ist.p2pbay.gossip.message.NodeCountMessage;
 import org.ist.p2pbay.gossip.message.UserCountMessage;
 import org.ist.p2pbay.gossip.repository.InformationRepository;
+import org.ist.p2pbay.gossip.worker.GossipRescheduler;
 import org.ist.p2pbay.gossip.worker.ItemCountWorker;
 import org.ist.p2pbay.gossip.worker.NodeCountWorker;
 import org.ist.p2pbay.gossip.worker.UserCountWorker;
@@ -35,6 +36,7 @@ import org.ist.p2pbay.util.Constants;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class GossipManager {
@@ -42,6 +44,7 @@ public class GossipManager {
     private NodeCountHandler nodeCountHandler;
     private UserCountHandler userCountHandler;
     private ItemCountHandler itemCountHandler;
+    private boolean isGossipStopped = false;
 
 
     private InformationRepository nodeInfoRepo;
@@ -51,6 +54,10 @@ public class GossipManager {
     NodeCountWorker nodeCountWorker;
     UserCountWorker userCountWorker;
     ItemCountWorker itemCountWorker;
+
+    GossipRescheduler rescheduler;
+
+    private AtomicInteger gossipRound = new AtomicInteger(0);
 
     public InformationRepository getNodeInfoRepo() {
         return nodeInfoRepo;
@@ -63,16 +70,14 @@ public class GossipManager {
 
     public GossipManager(Peer peer) {
         this.peer = peer;
-
-        this.nodeInfoRepo = new InformationRepository();
-        this.userInfoRepo = new InformationRepository();
-        this.itemInfoRepo = new InformationRepository();
-
+        // add initial values to repos
         initInfoRepos();
+        // setup handlers for incoming messages
         setupReplyHandlers();
-        this.nodeCountHandler = new NodeCountHandler(peer, nodeInfoRepo);
-        this.userCountHandler = new UserCountHandler(peer, userInfoRepo);
-        this.itemCountHandler = new ItemCountHandler(peer, itemInfoRepo);
+
+        this.nodeCountHandler = new NodeCountHandler(peer, nodeInfoRepo, this);
+        this.userCountHandler = new UserCountHandler(peer, userInfoRepo, this);
+        this.itemCountHandler = new ItemCountHandler(peer, itemInfoRepo, this);
 
     }
 
@@ -80,69 +85,134 @@ public class GossipManager {
         //this is the inital node since there are no peers for it.
         //for first node in the ring gossip will have 1.0 weight
         if (peer.getPeerBean().getPeerMap().size() == 0) {
-            nodeInfoRepo.setinfoHolder(new GossipObject(1.0, 1.0));
-            userInfoRepo.setinfoHolder(new GossipObject(1.0, 0.0));
-            itemInfoRepo.setinfoHolder(new GossipObject(1.0, 0.0));
+            this.nodeInfoRepo = new InformationRepository(new GossipObject(1.0, 1.0));
+            this.userInfoRepo = new InformationRepository(new GossipObject(1.0, 0.0));
+            this.itemInfoRepo = new InformationRepository(new GossipObject(1.0, 0.0));
+
             //for user info we do not have initial data
         } else {
-            nodeInfoRepo.setinfoHolder(new GossipObject(0.0, 1.0));
-            userInfoRepo.setinfoHolder(new GossipObject(0.0, 0.0));
-            itemInfoRepo.setinfoHolder(new GossipObject(0.0, 0.0));
+            this.nodeInfoRepo = new InformationRepository(new GossipObject(0.0, 1.0));
+            this.userInfoRepo = new InformationRepository(new GossipObject(0.0, 0.0));
+            this.itemInfoRepo = new InformationRepository(new GossipObject(0.0, 0.0));
         }
     }
 
     public void runGossip() {
+        rescheduler = new GossipRescheduler(this);
+        nodeCountWorker = new NodeCountWorker(peer, nodeInfoRepo, this);
+        userCountWorker = new UserCountWorker(peer, userInfoRepo, this);
+        itemCountWorker = new ItemCountWorker(peer, itemInfoRepo, this);
 
-        nodeCountWorker = new NodeCountWorker(peer, nodeInfoRepo);
-        userCountWorker = new UserCountWorker(peer, userInfoRepo);
-        itemCountWorker = new ItemCountWorker(peer, itemInfoRepo);
         nodeCountWorker.start();
         userCountWorker.start();
         itemCountWorker.start();
 
+        rescheduler.start();
+
+        isGossipStopped = false;
+
     }
 
     public void stopGossip() {
-       // handoverNodeCountInfo();
-        nodeCountWorker.setStop(true);
+        // handoverNodeCountInfo();
+        nodeCountWorker.interrupt();
+        userCountWorker.interrupt();
+        itemCountWorker.interrupt();
+        isGossipStopped = true;
     }
+
+    public void resumeGossip() {
+
+        nodeCountWorker = new NodeCountWorker(peer, nodeInfoRepo, this);
+        userCountWorker = new UserCountWorker(peer, userInfoRepo, this);
+        itemCountWorker = new ItemCountWorker(peer, itemInfoRepo, this);
+
+        nodeCountWorker.start();
+        userCountWorker.start();
+        itemCountWorker.start();
+
+        isGossipStopped = false;
+
+    }
+
 
     private void handoverNodeCountInfo() {
         List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
         if (peerAddressList.size() > 0) {
             PeerAddress address1 = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
-            NodeCountMessage nodeCountMessage = new NodeCountMessage(nodeInfoRepo.getInfoToHandover(Constants.HANDOVER_TYPE_NODE));
+            NodeCountMessage nodeCountMessage = new NodeCountMessage(nodeInfoRepo.
+                    getInfoToHandover(Constants.HANDOVER_TYPE_NODE), gossipRound.get());
             FutureResponse futureResponse1 = peer.sendDirect(address1).setObject(nodeCountMessage).start();
             futureResponse1.awaitUninterruptibly();
         }
     }
 
+    public void resetGossip() {
+        System.out.println("stopping gossip @ " + peer.getPeerAddress().portTCP());
+        stopGossip();
+        //wait twice as gossip frequency
+        try {
+            Thread.sleep(3 * Constants.GOSSIP_FREQUENCY_IN_MS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //so incoming messages will not be accepted after this ..!!!
+        gossipRound.getAndIncrement();
+
+        //we are resetting gossip object to new state
+        nodeInfoRepo.resetGossipObject();
+        //we are ready to be back into business.
+        resumeGossip();
+    }
+
+    public void adjustGossip(int recievedGossipVal) {
+        stopGossip();
+        //wait thrice as gossip frequency
+        try {
+            Thread.sleep(3 * Constants.GOSSIP_FREQUENCY_IN_MS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //we are resetting gossip object to new state
+        nodeInfoRepo.resetGossipObject();
+
+        gossipRound.set(recievedGossipVal);
+        //we are ready to be back into business.
+        resumeGossip();
+    }
+
+
     private void setupReplyHandlers() {
         peer.setObjectDataReply(new ObjectDataReply() {
             @Override
             public Object reply(PeerAddress sender, Object incomingMsg) throws Exception {
+                if (isGossipStopped) {
+                    return null;
+                }
                 Message message = (Message) incomingMsg;
                 switch (message.getMSGType()) {
                     case NODE_COUNT:
-                        nodeCountHandler.handleMessage((NodeCountMessage) message);
-                        break;
+                        return nodeCountHandler.handleMessage((NodeCountMessage) message);
                     case USER_COUNT:
-                        userCountHandler.handleMessage((UserCountMessage) message);
-                        break;
+                        return userCountHandler.handleMessage((UserCountMessage) message);
                     case ITEM_COUNT:
-                        itemCountHandler.handleMessage((ItemCountMessage) message);
-                        break;
-                }
+                        return itemCountHandler.handleMessage((ItemCountMessage) message);
 
-                return true;
+                }
+                return null;
             }
         });
 
 
     }
 
-
     public InformationRepository getItemInfoRepo() {
         return itemInfoRepo;
+    }
+
+    public AtomicInteger getGossipRound() {
+        return gossipRound;
     }
 }

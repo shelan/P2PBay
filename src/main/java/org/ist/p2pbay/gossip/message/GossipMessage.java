@@ -25,6 +25,7 @@ import java.io.Serializable;
  */
 public abstract class GossipMessage implements Serializable,Message {
     private GossipObject gossipObject;
+    private int gossipRound;
 
 
     public GossipObject getGossipObject() {
@@ -33,5 +34,13 @@ public abstract class GossipMessage implements Serializable,Message {
 
     public void setGossipObject(GossipObject gossipObject) {
         this.gossipObject = gossipObject;
+    }
+
+    public int getGossipRound() {
+        return gossipRound;
+    }
+
+    public void setGossipRound(int gossipRound) {
+        this.gossipRound = gossipRound;
     }
 }
