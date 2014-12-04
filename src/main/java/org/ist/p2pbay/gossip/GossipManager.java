@@ -36,6 +36,7 @@ import org.ist.p2pbay.util.Constants;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -44,7 +45,7 @@ public class GossipManager {
     private NodeCountHandler nodeCountHandler;
     private UserCountHandler userCountHandler;
     private ItemCountHandler itemCountHandler;
-    private boolean isGossipStopped = false;
+    private AtomicBoolean isGossipStopped = new AtomicBoolean(false);
 
 
     private InformationRepository nodeInfoRepo;
@@ -109,7 +110,7 @@ public class GossipManager {
 
         rescheduler.start();
 
-        isGossipStopped = false;
+        isGossipStopped.set(false);
 
     }
 
@@ -118,7 +119,7 @@ public class GossipManager {
         nodeCountWorker.interrupt();
         userCountWorker.interrupt();
         itemCountWorker.interrupt();
-        isGossipStopped = true;
+        isGossipStopped.set(true);
     }
 
     public void resumeGossip() {
@@ -131,7 +132,7 @@ public class GossipManager {
         userCountWorker.start();
         itemCountWorker.start();
 
-        isGossipStopped = false;
+        isGossipStopped.set(false);
 
     }
 
@@ -162,6 +163,8 @@ public class GossipManager {
 
         //we are resetting gossip object to new state
         nodeInfoRepo.resetGossipObject();
+        itemInfoRepo.resetGossipObject();
+        userInfoRepo.resetGossipObject();
         //we are ready to be back into business.
         resumeGossip();
     }
@@ -177,6 +180,8 @@ public class GossipManager {
 
         //we are resetting gossip object to new state
         nodeInfoRepo.resetGossipObject();
+        itemInfoRepo.resetGossipObject();
+        userInfoRepo.resetGossipObject();
 
         gossipRound.set(recievedGossipVal);
         //we are ready to be back into business.
@@ -188,7 +193,7 @@ public class GossipManager {
         peer.setObjectDataReply(new ObjectDataReply() {
             @Override
             public Object reply(PeerAddress sender, Object incomingMsg) throws Exception {
-                if (isGossipStopped) {
+                if (isGossipStopped.get()) {
                     return null;
                 }
                 Message message = (Message) incomingMsg;

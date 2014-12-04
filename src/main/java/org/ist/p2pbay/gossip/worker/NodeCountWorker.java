@@ -84,11 +84,15 @@ public class NodeCountWorker extends Thread {
 
                         //rollback message if not successful
                     String response ="FAILED";
-                    if(futureResponse.getResponse() != null)
-                    response = futureResponse.getResponse().getType().name();
+                    try {
+                        if (futureResponse.getResponse() != null)
+                            response = futureResponse.getResponse().getType().name();
+                    }finally {
                         if (!"OK".equals(response)) {
                             infoRepo.mergeGossipObject(message.getGossipObject());
                         }
+                    }
+
 
 
                 }

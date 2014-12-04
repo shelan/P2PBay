@@ -79,11 +79,15 @@ public class UserCountWorker extends Thread {
                 futureResponse.awaitUninterruptibly();
 
                 String response ="FAILED";
-                if(futureResponse.getResponse() != null)
-                    response = futureResponse.getResponse().getType().name();
-                if (!"OK".equals(response)) {
-                    userInfoRepo.mergeGossipObject(message.getGossipObject());
+                try {
+                    if (futureResponse.getResponse() != null)
+                        response = futureResponse.getResponse().getType().name();
+                }finally {
+                    if (!"OK".equals(response)) {
+                        userInfoRepo.mergeGossipObject(message.getGossipObject());
+                    }
                 }
+
 
 
             }
