@@ -75,7 +75,10 @@ public class ItemCountWorker extends Thread {
                 FutureResponse futureResponse = peer.sendDirect(address).setObject(message).start();
                 futureResponse.awaitUninterruptibly();
 
-                if (!"OK".equals(futureResponse.getResponse().getType().name())) {
+                String response ="FAILED";
+                if(futureResponse.getResponse() != null)
+                    response = futureResponse.getResponse().getType().name();
+                if (!"OK".equals(response)) {
                     itemInfoRepo.mergeGossipObject(message.getGossipObject());
                 }
 
