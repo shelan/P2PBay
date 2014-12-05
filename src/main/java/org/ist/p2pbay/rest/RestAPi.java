@@ -128,5 +128,12 @@ public class RestAPi {
             }
         });
 
+        get(new Route("/node/item-count") {
+            @Override
+            public Object handle(Request request, Response response) {
+                return app.getItemCount();
+            }
+        });
+
     }
 }
