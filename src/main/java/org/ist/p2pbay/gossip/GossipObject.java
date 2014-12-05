@@ -18,9 +18,6 @@ package org.ist.p2pbay.gossip;
 
 import java.io.Serializable;
 
-/**
- * Created by shelan on 11/27/14.
- */
 public class GossipObject implements Serializable {
     double weight;
 

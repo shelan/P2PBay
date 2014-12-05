@@ -20,9 +20,6 @@ import org.ist.test.NodeRepository;
 
 import java.util.ArrayList;
 
-/**
- * Created by shelan on 11/27/14.
- */
 public class GossipTestRunner {
 
     public static void main(String[] args) throws Exception {

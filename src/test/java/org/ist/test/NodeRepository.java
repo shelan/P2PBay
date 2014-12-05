@@ -23,9 +23,6 @@ import org.ist.P2PBayApp;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by shelan on 11/27/14.
- */
 public class NodeRepository {
 
     ArrayList<P2PBayApp> networkedAppList = new ArrayList<P2PBayApp>();

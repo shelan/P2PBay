@@ -23,9 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Created by shelan on 11/29/14.
- */
 public class InformationRepository {
     
     GossipObject infoHolder;

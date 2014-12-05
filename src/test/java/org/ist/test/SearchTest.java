@@ -1,3 +1,22 @@
+
+/*
+ *
+ *  * Copyright 2014
+ *  *
+ *  * Licensed under the Apache License, Version 2.0 (the "License");
+ *  * you may not use this file except in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  *     http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the License is distributed on an "AS IS" BASIS,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the License for the specific language governing permissions and
+ *  * limitations under the License.
+ *
+ */
+
 package org.ist.test;
 
 import org.apache.commons.logging.Log;
@@ -21,9 +40,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by ashansa on 12/4/14.
- */
 public class SearchTest {
 
     NodeRepository repository = new NodeRepository();
@@ -36,14 +52,14 @@ public class SearchTest {
     String basePassword = "userpw";
     String baseItemName = "item";
     String baseDescription = "Description";
-    //String host = "http://planetlab-um00.di.uminho.pt";
-    String host = "http://127.0.0.1";
+    String host = "http://planetlab-um00.di.uminho.pt";
+    //String host = "http://127.0.0.1";
 
     public static void main(String[] args) throws P2PBayException, ClassNotFoundException, NoSuchAlgorithmException, InterruptedException, IOException {
         SearchTest test = new SearchTest();
         //test.init();
-         test.testUserAdding();
-        //test.testAddandGetItems();
+         //test.testUserAdding();
+        test.testAddandGetItems();
         //test.search();
     }
 
@@ -64,7 +80,7 @@ public class SearchTest {
         System.out.println("Adding users");
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 10; i++) {
             String userName = baseUserName + i;
             String password = basePassword + i;
 
@@ -92,7 +108,7 @@ public class SearchTest {
 
         String[] titleParts = {"item","short","two","old","new","other","ayyo","work","tshirt","sell","cloths","cup","slippers","table","skirt"};
         Random random = new Random();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
                 String itemTitle = titleParts[random.nextInt(14)] + "-" + titleParts[random.nextInt(14)];
             ClientResource resource = new ClientResource(host+":4567/node/item/create/"+
             itemTitle+"/"+baseDescription+i+"/"+baseUserName+i);

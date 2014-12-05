@@ -20,9 +20,6 @@ import org.ist.p2pbay.gossip.GossipObject;
 
 import java.io.Serializable;
 
-/**
- * Created by shelan on 11/29/14.
- */
 public abstract class GossipMessage implements Serializable,Message {
     private GossipObject gossipObject;
     private int gossipRound;

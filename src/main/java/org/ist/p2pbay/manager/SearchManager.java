@@ -28,10 +28,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by ashansa on 11/4/14.
- */
-
 /*
 Search is case insensitive
  */

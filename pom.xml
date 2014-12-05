@@ -66,6 +66,9 @@
                     <excludes>
                         <exclude>**/GossipTestRunner.java</exclude>
                         <exclude>**/TestRunner.java</exclude>
+                        <exclude>**/P2pGossipTest.java</exclude>
+                        <exclude>**/SearchTest.java</exclude>
+                        <exclude>**/ItemCountTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

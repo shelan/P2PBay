@@ -30,9 +30,6 @@ import org.ist.p2pbay.util.Constants;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by shelan on 11/27/14.
- */
 public class NodeCountWorker extends Thread {
 
     private Peer peer;
