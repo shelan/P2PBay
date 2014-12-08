@@ -140,24 +140,24 @@ public class GossipManager {
         String response = "FAILED";
         int count = 0;
 
-        while(!"OK".equals(response)) {
-            if(count == 10)
+        while (!"OK".equals(response)) {
+            if (count == 10)
                 break;
 
             if (peerAddressList.size() > 0) {
                 PeerAddress address1 = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
                 HandoverDetailsMessage handoverDetailsMessage = new HandoverDetailsMessage(
                         userInfoRepo.getTotalCount().get(), itemInfoRepo.getTotalCount().get(), nodeInfoRepo.getinfoHolder().
-                        getCount() -1 , nodeInfoRepo.getinfoHolder().getWeight(), nodeInfoRepo.getInitialWeight());
-                FutureResponse futureResponse1 = peer.sendDirect(address1).setObject(handoverDetailsMessage).start();
-                futureResponse1.awaitUninterruptibly();
-                if(futureResponse1!= null) {
-                    response = futureResponse1.getResponse().getType().name();
+                        getCount() - 1, nodeInfoRepo.getinfoHolder().getWeight(), nodeInfoRepo.getInitialWeight());
+                FutureResponse futureResponse = peer.sendDirect(address1).setObject(handoverDetailsMessage).start();
+                futureResponse.awaitUninterruptibly();
+                if (futureResponse != null && futureResponse.getResponse() != null) {
+                    response = futureResponse.getResponse().getType().name();
                     System.out.println("got response: " + response);
                 }
 
             }
-            count ++;
+            count++;
         }
         System.out.println("Finish sending handing over......");
     }
@@ -229,14 +229,14 @@ public class GossipManager {
 
     }
 
-    private BaseFuture.FutureType acceptHandoverDetails(HandoverDetailsMessage handoverDetailsMessage){
+    private BaseFuture.FutureType acceptHandoverDetails(HandoverDetailsMessage handoverDetailsMessage) {
         System.out.println("Received handover..........");
         nodeInfoRepo.mergeHandoverCounts(0.0, handoverDetailsMessage.getWeight());
         itemInfoRepo.mergeHandoverCounts(handoverDetailsMessage.getItemCount(), handoverDetailsMessage.getWeight());
         userInfoRepo.mergeHandoverCounts(handoverDetailsMessage.getUserCount(), handoverDetailsMessage.getWeight());
 
         nodeInfoRepo.mergeGossipObject(new GossipObject(handoverDetailsMessage.getGossipWeight(),
-                                        handoverDetailsMessage.getGossipNodeCount()));
+                handoverDetailsMessage.getGossipNodeCount()));
         return FutureResponse.FutureType.OK;
     }
 
