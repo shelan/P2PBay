@@ -151,8 +151,10 @@ public class GossipManager {
                         getCount() -1 , nodeInfoRepo.getinfoHolder().getWeight(), nodeInfoRepo.getInitialWeight());
                 FutureResponse futureResponse1 = peer.sendDirect(address1).setObject(handoverDetailsMessage).start();
                 futureResponse1.awaitUninterruptibly();
-                response = futureResponse1.getResponse().getType().name();
-                System.out.println("got response: "+response);
+                if(futureResponse1!= null) {
+                    response = futureResponse1.getResponse().getType().name();
+                    System.out.println("got response: " + response);
+                }
 
             }
             count ++;
