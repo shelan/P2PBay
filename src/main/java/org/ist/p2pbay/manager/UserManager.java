@@ -95,6 +95,17 @@ public class UserManager {
         }
     }
 
+    public void updateUser(String name, User obj) throws P2PBayException {
+        try {
+            peer.put(Number160.createHash(name)).setData(new Data(obj)).setDomainKey(Number160.createHash(Constants.USER_DOMAIN))
+                    .start().awaitUninterruptibly();
+
+        } catch (Exception ex) {
+           log.error(ex);
+           throw new P2PBayException("Exception thrown while accessing object");
+        }
+    }
+
     public void removeUser(String name) {
         try {
             peer.remove(Number160.createHash(name)).setDomainKey(Number160.createHash(Constants.USER_DOMAIN))

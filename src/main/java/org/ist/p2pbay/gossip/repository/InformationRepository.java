@@ -27,7 +27,7 @@ public class InformationRepository {
     
     GossipObject infoHolder;
     private double initialWeight;
-    AtomicLong totalCount ;
+    private AtomicLong totalCount ;
     Lock lock = new ReentrantLock();
 
     public InformationRepository(GossipObject infoHolder){
@@ -80,36 +80,31 @@ public class InformationRepository {
     public void resetGossipObject(){
         lock.lock();
         try{
-            infoHolder.setWeight(initialWeight);
-            infoHolder.setCount(totalCount.get());
+            infoHolder.setWeight(getInitialWeight());
+            infoHolder.setCount(getTotalCount().get());
         }finally {
             lock.unlock();
         }
     }
 
-    public GossipObject getInfoToHandover(int type) {
-        lock.lock();
-        try {
-            switch (type) {
-                case Constants.HANDOVER_TYPE_NODE:
-                    infoHolder.setCount(infoHolder.getCount() -1 );
-                    infoHolder.setWeight(infoHolder.getWeight());
-                    return infoHolder;
-
-                default:
-                    return null;
-            }
-        }
-        finally {
-            lock.unlock();
-        }
-    }
-
     public void incrementCounter(){
-        totalCount.getAndIncrement();
+        getTotalCount().getAndIncrement();
     }
 
     public void decrementCounter(){
         totalCount.getAndDecrement();
+    }
+
+    public double getInitialWeight() {
+        return initialWeight;
+    }
+
+    public AtomicLong getTotalCount() {
+        return totalCount;
+    }
+
+    public void mergeHandoverCounts(double count, double weight) {
+        totalCount.getAndAdd((long) count);
+        initialWeight += weight;
     }
 }

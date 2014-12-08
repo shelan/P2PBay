@@ -18,5 +18,5 @@
 package org.ist.p2pbay.gossip.message;
 
 public enum MessageType {
-    NODE_COUNT, USER_COUNT, ITEM_COUNT
+    NODE_COUNT, USER_COUNT, ITEM_COUNT, HANDOVER
 }

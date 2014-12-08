@@ -74,6 +74,18 @@ public class SalesManager {
         }
     }
 
+    public void updateItem(String name, Item item) throws P2PBayException {
+        try {
+            FutureDHT futureDHT = peer.put(Number160.createHash(name)).setData(new Data(item))
+                    .setDomainKey(Number160.createHash(Constants.ITEM_DOMAIN))
+                    .start();
+            futureDHT.awaitUninterruptibly();
+
+        } catch (Exception ex) {
+           throw new P2PBayException("Error while adding item",ex);
+        }
+    }
+
     /**
      * @param title
      * @return
@@ -132,7 +144,7 @@ public class SalesManager {
             }
             BidInfo bidInfo = bidManager.getHighestBid(itemTitle);
             currentItem.setIsSold(true);
-            addItem(itemTitle, currentItem);
+            updateItem(itemTitle, currentItem);
             log.debug("Accepted " + bidInfo.getAmount() + "of user " + bidInfo.getUserId() + " for item " + itemTitle);
             return bidInfo;
         } catch (Exception ex) {

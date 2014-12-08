@@ -116,7 +116,7 @@ public class P2PSellingTest {
 
             User user = userManager.getUser(baseUserName + i);
             user.addBadeItems(baseItemName + 1, bidAmount);
-            userManager.addUser(baseUserName + i, user);
+            userManager.updateUser(baseUserName + i, user);
         }
 
 
@@ -142,8 +142,8 @@ public class P2PSellingTest {
 
         seller.removeFromSellingItems(baseItemName + 1);
 
-        userManager.addUser(seller.getName(), seller);
-        userManager.addUser(winningUser.getName(), winningUser);
+        userManager.updateUser(seller.getName(), seller);
+        userManager.updateUser(winningUser.getName(), winningUser);
 
         Thread.sleep(2000);
 

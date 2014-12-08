@@ -36,7 +36,7 @@ public class NodeRepository {
     public ArrayList<P2PBayApp> createAppNetWork(int numberOfApps) throws Exception {
         for (int i =0 ; i< numberOfApps ; i++) {
             P2PBayApp app = new P2PBayApp();
-            app.bootstrap ("127.0.0.1",String.valueOf(4000),String.valueOf(4000+i));
+            app.bootstrap ("127.0.0.1",String.valueOf(4003),String.valueOf(4003+i));
             networkedAppList.add(app);
         }
         return networkedAppList;

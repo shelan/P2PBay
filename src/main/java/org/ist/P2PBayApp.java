@@ -114,7 +114,11 @@ public class P2PBayApp {
         try {
             log.info("Shutting down node ...!!!");
             gossipManager.stopGossip();
+            Thread.sleep(2000);
+            gossipManager.handoverGossipInfo();
+            Thread.sleep(2000);
             peer.shutdown();
+            Thread.sleep(2000);
         } catch (Exception e) {
             log.error("Error while shutting down the peer", e);
         }
@@ -158,7 +162,7 @@ public class P2PBayApp {
         if (isSuccessful) {
             User user = userManager.getUser(userName);
             user.addBadeItems(itemName, amount);
-            userManager.addUser(userName, user);
+            userManager.updateUser(userName, user);
         }
         return isSuccessful;
     }
@@ -186,8 +190,8 @@ public class P2PBayApp {
 
             seller.removeFromSellingItems(itemTitle);
 
-            userManager.addUser(seller.getName(), seller);
-            userManager.addUser(winningUser.getName(), winningUser);
+            userManager.updateUser(seller.getName(), seller);
+            userManager.updateUser(winningUser.getName(), winningUser);
 
             salesManager.removeItem(itemTitle);
             searchManager.removeItemFromKeywordObjects(itemTitle);

@@ -16,6 +16,7 @@
 
 package org.ist.p2pbay.gossip;
 
+import net.tomp2p.futures.BaseFuture;
 import net.tomp2p.futures.FutureResponse;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.PeerAddress;
@@ -23,10 +24,7 @@ import net.tomp2p.rpc.ObjectDataReply;
 import org.ist.p2pbay.gossip.handler.ItemCountHandler;
 import org.ist.p2pbay.gossip.handler.NodeCountHandler;
 import org.ist.p2pbay.gossip.handler.UserCountHandler;
-import org.ist.p2pbay.gossip.message.ItemCountMessage;
-import org.ist.p2pbay.gossip.message.Message;
-import org.ist.p2pbay.gossip.message.NodeCountMessage;
-import org.ist.p2pbay.gossip.message.UserCountMessage;
+import org.ist.p2pbay.gossip.message.*;
 import org.ist.p2pbay.gossip.repository.InformationRepository;
 import org.ist.p2pbay.gossip.worker.GossipRescheduler;
 import org.ist.p2pbay.gossip.worker.ItemCountWorker;
@@ -115,7 +113,6 @@ public class GossipManager {
     }
 
     public void stopGossip() {
-        // handoverNodeCountInfo();
         nodeCountWorker.interrupt();
         userCountWorker.interrupt();
         itemCountWorker.interrupt();
@@ -137,15 +134,30 @@ public class GossipManager {
     }
 
 
-    private void handoverNodeCountInfo() {
+    public void handoverGossipInfo() {
+        System.out.println("handing over.............");
         List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
-        if (peerAddressList.size() > 0) {
-            PeerAddress address1 = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
-            NodeCountMessage nodeCountMessage = new NodeCountMessage(nodeInfoRepo.
-                    getInfoToHandover(Constants.HANDOVER_TYPE_NODE), gossipRound.get());
-            FutureResponse futureResponse1 = peer.sendDirect(address1).setObject(nodeCountMessage).start();
-            futureResponse1.awaitUninterruptibly();
+        String response = "FAILED";
+        int count = 0;
+
+        while(!"OK".equals(response)) {
+            if(count == 10)
+                break;
+
+            if (peerAddressList.size() > 0) {
+                PeerAddress address1 = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
+                HandoverDetailsMessage handoverDetailsMessage = new HandoverDetailsMessage(
+                        userInfoRepo.getTotalCount().get(), itemInfoRepo.getTotalCount().get(), nodeInfoRepo.getinfoHolder().
+                        getCount() -1 , nodeInfoRepo.getinfoHolder().getWeight(), nodeInfoRepo.getInitialWeight());
+                FutureResponse futureResponse1 = peer.sendDirect(address1).setObject(handoverDetailsMessage).start();
+                futureResponse1.awaitUninterruptibly();
+                response = futureResponse1.getResponse().getType().name();
+                System.out.println("got response: "+response);
+
+            }
+            count ++;
         }
+        System.out.println("Finish sending handing over......");
     }
 
     public void resetGossip() {
@@ -204,6 +216,8 @@ public class GossipManager {
                         return userCountHandler.handleMessage((UserCountMessage) message);
                     case ITEM_COUNT:
                         return itemCountHandler.handleMessage((ItemCountMessage) message);
+                    case HANDOVER:
+                        return acceptHandoverDetails((HandoverDetailsMessage) message);
 
                 }
                 return null;
@@ -211,6 +225,17 @@ public class GossipManager {
         });
 
 
+    }
+
+    private BaseFuture.FutureType acceptHandoverDetails(HandoverDetailsMessage handoverDetailsMessage){
+        System.out.println("Received handover..........");
+        nodeInfoRepo.mergeHandoverCounts(0.0, handoverDetailsMessage.getWeight());
+        itemInfoRepo.mergeHandoverCounts(handoverDetailsMessage.getItemCount(), handoverDetailsMessage.getWeight());
+        userInfoRepo.mergeHandoverCounts(handoverDetailsMessage.getUserCount(), handoverDetailsMessage.getWeight());
+
+        nodeInfoRepo.mergeGossipObject(new GossipObject(handoverDetailsMessage.getGossipWeight(),
+                                        handoverDetailsMessage.getGossipNodeCount()));
+        return FutureResponse.FutureType.OK;
     }
 
     public InformationRepository getItemInfoRepo() {

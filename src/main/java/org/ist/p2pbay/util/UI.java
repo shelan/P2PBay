@@ -88,7 +88,7 @@ public class UI {
             case 4:
                 String exit = console.readLine("Do you really want to exit? (Y/N)");
                 if(Constants.EXIT.equalsIgnoreCase(exit)) {
-                    //TODO give gossip info to a node in app.exitApp()
+                    app.shutDown();
                     System.exit(0);
                 } else {
                     launchMainMenuUI();
