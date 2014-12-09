@@ -363,13 +363,16 @@ public class UI {
             if(app.getItem(itemTitle) != null) {
                 double bid = Double.valueOf(console.readLine("Enter your bid:"));
                 boolean isSuccessful = app.bidItem(itemTitle, bid, userName);
+                BidInfo highestBid = app.getHighestBid(itemTitle);
                 if(isSuccessful) {
-                    BidInfo highestBid = app.getHighestBid(itemTitle);
                     if(bid < highestBid.getAmount())
                         System.out.println("Your bid was outbidded...!!!. Highest bid: " + highestBid.getAmount());
                     else
                         System.out.println("Bid added successfully");
                 } else {
+                    if(bid < highestBid.getAmount())
+                        System.out.println("Your bid was outbidded...!!!. Highest bid: " + highestBid.getAmount());
+                    else
                     System.out.println("Failed to add Bid. Please try again");
                 }
             } else {

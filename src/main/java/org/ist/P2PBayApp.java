@@ -189,17 +189,17 @@ public class P2PBayApp {
             User winningUser = userManager.getUser(highestBid.getUserId());
             User seller = userManager.getUser(salesManager.getItem(itemTitle).getSellerId());
 
-            winningUser.addPurchasedItems(itemTitle, highestBid.getAmount());
-            winningUser.removeFromBadeItems(itemTitle);
+            if(winningUser != null) {
+                winningUser.addPurchasedItems(itemTitle, highestBid.getAmount());
+                winningUser.removeFromBadeItems(itemTitle);
+                userManager.updateUser(winningUser.getName(), winningUser);
+            }
 
             seller.removeFromSellingItems(itemTitle);
-
             userManager.updateUser(seller.getName(), seller);
-            userManager.updateUser(winningUser.getName(), winningUser);
 
             salesManager.removeItem(itemTitle);
             searchManager.removeItemFromKeywordObjects(itemTitle);
-            //TODO remove from gossip???? but as per tests remove item should do
         }
         return bidInfo;
     }
