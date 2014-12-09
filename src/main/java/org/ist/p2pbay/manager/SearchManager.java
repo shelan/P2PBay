@@ -69,7 +69,6 @@ public class SearchManager {
     }
 
     private String[] getKeywordsArray(String keywordString) {
-        // TODO avoid common words - the , on, ...
         return keywordString.split(" ");
     }
 
@@ -80,13 +79,12 @@ public class SearchManager {
                 //add a new object for that KEYWORD_DOMAIN
                 Keyword newKeyword = new Keyword();
                 newKeyword.addItem(itemId);
-                peer.put(Number160.createHash(keyword)).setData(new Data(newKeyword)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
+                peer.put(Number160.createHash(Constants.KEYWORD_DOMAIN+keyword)).setData(new Data(newKeyword)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
                         .start().awaitUninterruptibly();
             } else {
 
-                ////// TODO how to update without put again??
                 existingObject.addItem(itemId);
-                peer.put(Number160.createHash(keyword)).setData(new Data(existingObject)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
+                peer.put(Number160.createHash(Constants.KEYWORD_DOMAIN+keyword)).setData(new Data(existingObject)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
                         .start().awaitUninterruptibly();
             }
         } catch (Exception ex) {
@@ -97,7 +95,7 @@ public class SearchManager {
 
     private void replaceKeywordObject(String keyword, Keyword keywordObj) {
         try {
-            peer.put(Number160.createHash(keyword)).setData(new Data(keywordObj)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
+            peer.put(Number160.createHash(Constants.KEYWORD_DOMAIN+keyword)).setData(new Data(keywordObj)).setDomainKey(Number160.createHash(Constants.KEYWORD_DOMAIN))
                     .start().awaitUninterruptibly();
         } catch (IOException e) {
             e.printStackTrace();
@@ -148,7 +146,7 @@ public class SearchManager {
 
     private Keyword getKeywordObject(String keyword) {
         try {
-            FutureDHT futureDHT = peer.get(Number160.createHash(keyword)).
+            FutureDHT futureDHT = peer.get(Number160.createHash(Constants.KEYWORD_DOMAIN+keyword)).
                     setDomainKey((Number160.createHash(Constants.KEYWORD_DOMAIN)))
                     .start();
             futureDHT.awaitUninterruptibly();

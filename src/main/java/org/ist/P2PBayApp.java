@@ -167,6 +167,10 @@ public class P2PBayApp {
         return isSuccessful;
     }
 
+    public BidInfo getHighestBid(String itemName) throws P2PBayException {
+        return bidManager.getHighestBid(itemName);
+    }
+
     public String[] simpleSearch(String keyword) {
         String[] items = searchManager.getMatchingItems(keyword);
         return items;
