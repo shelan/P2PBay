@@ -54,7 +54,7 @@ public class P2pGossipTest{
     public void init() {
         try {
             appList = repository.createAppNetWork(numberOfApps);
-            Thread.sleep(3000);
+            Thread.sleep(20000);
         } catch (Exception e) {
             log.error("error while initializing", e);
         }
@@ -87,7 +87,7 @@ public class P2pGossipTest{
             byte[] passwordDigest = messageDigest.digest();
             userManager.addUser(userName, new User(userName, passwordDigest));
         }
-        Thread.sleep(5000);
+        Thread.sleep(20000);
         GossipObject info = appList.get(new Random().nextInt(numberOfApps)).
                 getGossipManager().getUserInfoRepo().getinfoHolder();
         System.out.println("user count " + info.getCount() / info.getWeight());
@@ -122,7 +122,7 @@ public class P2pGossipTest{
             byte[] passwordDigest = messageDigest.digest();
             userManager.removeUser(userName);
         }
-        Thread.sleep(2000);
+        Thread.sleep(20000);
         GossipObject info = appList.get(new Random().nextInt(numberOfApps)).
                 getGossipManager().getUserInfoRepo().getinfoHolder();
         System.out.println("user count " + info.getCount() / info.getWeight());
@@ -150,7 +150,7 @@ public class P2pGossipTest{
             SalesManager salesManager = appList.get(new Random().nextInt(numberOfApps)).getSalesManager();
             salesManager.removeItem(baseItemName + i);
         }
-            Thread.sleep(2000);
+            Thread.sleep(20000);
 
             GossipObject info = appList.get(new Random().nextInt(numberOfApps)).
                     getGossipManager().getItemInfoRepo().getinfoHolder();
