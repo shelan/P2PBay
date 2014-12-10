@@ -224,6 +224,14 @@ public class P2PBayApp {
         return new Hashtable<String, Double>();
     }
 
+    public void resetGossip(){
+        gossipManager.resetGossip();
+    }
+
+    public void runStatPublisher(boolean shouldRun){
+
+    }
+
     public int getNodeCount() {
         GossipObject gossipObject = gossipManager.getNodeInfoRepo().getinfoHolder();
         return (int) Math.round(gossipObject.getCount() / gossipObject.getWeight());

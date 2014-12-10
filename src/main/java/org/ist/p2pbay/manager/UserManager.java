@@ -62,7 +62,6 @@ public class UserManager {
             originalDecoded = new String(user.getPassword(), Constants.CHARSET_NAME_UTF_8);
             enteredDecoded = new String(enteredDigest, Constants.CHARSET_NAME_UTF_8);
         } catch (Exception e) {
-            log.error(e);
             throw new P2PBayException("Error while encoding");
         }
 
@@ -90,27 +89,51 @@ public class UserManager {
             notifyGossipManager(true);
 
         } catch (Exception ex) {
-           log.error(ex);
-           throw new P2PBayException("Exception thrown while accessing object");
+            throw new P2PBayException("Exception thrown while accessing object");
         }
     }
 
     public void updateUser(String name, User obj) throws P2PBayException {
         try {
-            peer.put(Number160.createHash(name)).setData(new Data(obj)).setDomainKey(Number160.createHash(Constants.USER_DOMAIN))
-                    .start().awaitUninterruptibly();
+            boolean isSuccess = false;
+            int counter = 0;
+            while (!isSuccess) {
+                if (counter > 4) {
+                    return;
+                }
+                FutureDHT futureDHT = peer.put(Number160.createHash(name)).setData(new Data(obj)).
+                        setDomainKey(Number160.createHash(Constants.USER_DOMAIN))
+                        .start().awaitUninterruptibly();
+                isSuccess = futureDHT.isSuccess();
+                counter++;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.debug("interrupted");
+                }
+            }
 
         } catch (Exception ex) {
-           log.error(ex);
-           throw new P2PBayException("Exception thrown while accessing object");
+            throw new P2PBayException("Exception thrown while accessing object");
         }
     }
 
     public void removeUser(String name) {
         try {
-            peer.remove(Number160.createHash(name)).setDomainKey(Number160.createHash(Constants.USER_DOMAIN))
-                    .start().awaitUninterruptibly();
+            boolean isSuccess = false;
+            int counter = 0;
+            while (!isSuccess) {
+                if (counter > 4) {
+                    return;
+                }
+                FutureDHT futureDHT = peer.remove(Number160.createHash(name)).
+                        setDomainKey(Number160.createHash(Constants.USER_DOMAIN))
+                        .start().awaitUninterruptibly();
+                isSuccess = futureDHT.isSuccess();
+                counter++;
+            }
             notifyGossipManager(false);
+
 
         } catch (Exception ex) {
             ex.printStackTrace();

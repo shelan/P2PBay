@@ -123,7 +123,7 @@ public class SalesManager {
             bidManager.addBid(itemTitle, new BidInfo(userName, bid));
             return true;
         } catch (Exception ex) {
-            log.error("Error while updating the bid. " + ex);
+            log.debug("Error while updating the bid. " + ex);
             return false;
         }
     }
@@ -154,10 +154,25 @@ public class SalesManager {
     }
 
     public void removeItem(String itemName){
-        FutureDHT futureDHT = peer.remove(Number160.createHash(itemName)).
-                setDomainKey((Number160.createHash(Constants.ITEM_DOMAIN)))
-                .start();
-        futureDHT.awaitUninterruptibly();
+        boolean isSuccess = false;
+        int counter = 0;
+        while (!isSuccess) {
+            if (counter > 4) {
+                return;
+            }
+            FutureDHT futureDHT = peer.remove(Number160.createHash(itemName)).
+                    setDomainKey((Number160.createHash(Constants.ITEM_DOMAIN)))
+                    .start();
+            futureDHT.awaitUninterruptibly();
+            isSuccess = futureDHT.isSuccess();
+            counter ++;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                log.debug("interrupted");
+            }
+        }
+
         notifyGossipManager(false);
     }
 

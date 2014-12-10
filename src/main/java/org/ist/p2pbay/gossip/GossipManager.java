@@ -135,7 +135,6 @@ public class GossipManager {
 
 
     public void handoverGossipInfo() {
-        System.out.println("handing over.............");
         List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
         String response = "FAILED";
         int count = 0;
@@ -153,17 +152,14 @@ public class GossipManager {
                 futureResponse.awaitUninterruptibly();
                 if (futureResponse != null && futureResponse.getResponse() != null) {
                     response = futureResponse.getResponse().getType().name();
-                    System.out.println("got response: " + response);
                 }
 
             }
             count++;
         }
-        System.out.println("Finish sending handing over......");
     }
 
     public void resetGossip() {
-        System.out.println("stopping gossip @ " + peer.getPeerAddress().portTCP());
         stopGossip();
         //wait twice as gossip frequency
         try {
@@ -230,7 +226,6 @@ public class GossipManager {
     }
 
     private BaseFuture.FutureType acceptHandoverDetails(HandoverDetailsMessage handoverDetailsMessage) {
-        System.out.println("Received handover..........");
         nodeInfoRepo.mergeHandoverCounts(0.0, handoverDetailsMessage.getWeight());
         itemInfoRepo.mergeHandoverCounts(handoverDetailsMessage.getItemCount(), handoverDetailsMessage.getWeight());
         userInfoRepo.mergeHandoverCounts(handoverDetailsMessage.getUserCount(), handoverDetailsMessage.getWeight());

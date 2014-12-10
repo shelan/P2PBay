@@ -61,7 +61,15 @@ public class NodeCountWorker extends Thread {
                     return;
                 }
 
-                List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
+
+                List<PeerAddress> peerAddressList = null;
+                try {
+                    peerAddressList = peer.getPeerBean().getPeerMap().getAll();
+                } catch (Exception e) {
+                   log.debug("error while getting peer list");
+                    return;
+                }
+
                 if (peerAddressList.size() > 0) {
                     PeerAddress address = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
                     //System.out.println("Sending request from " + peer);
@@ -78,7 +86,6 @@ public class NodeCountWorker extends Thread {
 
                     FutureResponse futureResponse = peer.sendDirect(address).setObject(message).start();
                     futureResponse.awaitUninterruptibly();
-
                         //rollback message if not successful
                     String response ="FAILED";
                     try {

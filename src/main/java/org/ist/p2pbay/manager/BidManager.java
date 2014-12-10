@@ -53,7 +53,6 @@ public class BidManager {
             isSuccess = futureDHT.isSuccess();
 
         } catch (Exception ex) {
-            log.error(ex);
             throw new P2PBayException("Exception thrown while accessing object");
         }
         return isSuccess;
@@ -77,7 +76,6 @@ public class BidManager {
             }
 
         } catch (Exception ex) {
-            log.error(ex);
             throw new P2PBayException("Exception thrown while retrieving object");
         }
 

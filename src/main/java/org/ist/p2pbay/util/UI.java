@@ -371,7 +371,8 @@ public class UI {
                         System.out.println("Bid added successfully");
                 } else {
                     if(bid < highestBid.getAmount())
-                        System.out.println("Your bid was outbidded...!!!. Highest bid: " + highestBid.getAmount());
+                        System.out.println("your bid was lower than current highest bid: " + highestBid.getAmount()+" " +
+                                "please try again with a higher bid");
                     else
                     System.out.println("Failed to add Bid. Please try again");
                 }

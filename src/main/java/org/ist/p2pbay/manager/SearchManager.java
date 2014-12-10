@@ -20,6 +20,8 @@ import net.tomp2p.futures.FutureDHT;
 import net.tomp2p.p2p.Peer;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.storage.Data;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.ist.p2pbay.util.Constants;
 import org.ist.p2pbay.data.Keyword;
 
@@ -34,6 +36,7 @@ Search is case insensitive
 public class SearchManager {
 
     private Peer peer;
+    private static Log log = LogFactory.getLog(SearchManager.class);
 
 
     public SearchManager(Peer peer) {
@@ -150,13 +153,12 @@ public class SearchManager {
                     setDomainKey((Number160.createHash(Constants.KEYWORD_DOMAIN)))
                     .start();
             futureDHT.awaitUninterruptibly();
-            if (futureDHT.isSuccess()) {
+            if (futureDHT.isSuccess() && futureDHT.getData() != null) {
                 Keyword item = (Keyword) futureDHT.getData().getObject();
                 return item;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Exception thrown while retrieving object");
+          //do nothing
         }
         return null;
     }

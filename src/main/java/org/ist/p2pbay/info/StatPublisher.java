@@ -39,23 +39,25 @@ public class StatPublisher extends Thread {
         this.gossipManager = gossipManager;
         this.shouldRun = shouldRun;
 
-        peer.getPeerBean().getPeerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
-            @Override
-            public void peerInserted(PeerAddress peerAddress) {
-                log.info("peer added " + peerAddress.toString());
-            }
+        if(this.shouldRun) {
+            peer.getPeerBean().getPeerMap().addPeerMapChangeListener(new PeerMapChangeListener() {
+                @Override
+                public void peerInserted(PeerAddress peerAddress) {
+                    log.info("peer added " + peerAddress.toString());
+                }
 
-            @Override
-            public void peerRemoved(PeerAddress peerAddress) {
-                log.info("peer removed " + peerAddress.toString());
-            }
+                @Override
+                public void peerRemoved(PeerAddress peerAddress) {
+                    log.info("peer removed " + peerAddress.toString());
+                }
 
-            @Override
-            public void peerUpdated(PeerAddress peerAddress) {
-                log.info("peer updated " + peerAddress.toString());
-            }
+                @Override
+                public void peerUpdated(PeerAddress peerAddress) {
+                    log.info("peer updated " + peerAddress.toString());
+                }
 
-        });
+            });
+        }
     }
 
     @Override

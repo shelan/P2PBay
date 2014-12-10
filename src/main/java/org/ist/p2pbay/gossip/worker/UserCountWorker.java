@@ -60,7 +60,12 @@ public class UserCountWorker extends Thread {
 
             }
 
-            List<PeerAddress> peerAddressList = peer.getPeerBean().getPeerMap().getAll();
+            List<PeerAddress> peerAddressList = null;
+            try {
+                peerAddressList = peer.getPeerBean().getPeerMap().getAll();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (peerAddressList.size() > 0) {
                 PeerAddress address = peerAddressList.get(new Random().nextInt(peerAddressList.size()));
                 //System.out.println("Sending request from " + peer);

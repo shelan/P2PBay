@@ -37,7 +37,7 @@ public class GossipRescheduler extends Thread {
         while (!isInterrupted()) {
             try {
                 int random = new Random().nextInt(3);
-                Thread.sleep(60000*(random+10));
+                Thread.sleep(60000*((random+1)*15));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

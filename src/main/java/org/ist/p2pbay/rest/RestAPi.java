@@ -154,5 +154,29 @@ public class RestAPi {
             }
         });
 
+        get(new Route("/node/user-count") {
+            @Override
+            public Object handle(Request request, Response response) {
+                return app.getItemCount();
+            }
+        });
+
+        get(new Route("/node/node-count") {
+            @Override
+            public Object handle(Request request, Response response) {
+                return app.getNodeCount();
+            }
+        });
+
+        get(new Route("/node/reset-gossip") {
+            @Override
+            public Object handle(Request request, Response response) {
+                app.resetGossip();
+                return "gossip reset command sent ...";
+            }
+        });
+
+
+
     }
 }
